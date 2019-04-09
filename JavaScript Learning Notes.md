@@ -1296,7 +1296,7 @@ var Person = {
 }
 ```
 
-## 属性的增删改查
+## 属性的增、删、改、查
 
 - 增
 
@@ -1333,5 +1333,44 @@ console.log(Person.name)
 var Person = {name: "Tishacy"}
 console.log(Person.name)
 // 'Tishacy'
+```
+
+## 对象的创建方法
+
+### plainObject（对象字面量/对象直接量）
+
+```js
+var obj = {
+    // attributes and methods
+}
+```
+
+### 构造函数
+
+#### 系统自带的构造函数 `Object()`
+
+```js
+var obj = new Object();
+obj.name = "Tishacy";
+obj.eat = function () {console.log("I am eating.")};
+```
+
+#### 自定义构造函数
+
+自定义构造函数与普通函数在结构上没有任何区别，但是为了区分，对象的构造函数使用大驼峰式的命名方式（如：`TheFirstObject`），而函数使用小驼峰式的命名方式（如：`theFirstObject`）。
+
+```js
+function Car() {
+	this.name = "BMW";
+	this.height = "1400";
+    this.long = "4900";
+    this.weight = 1000;
+    this.health = 100;
+    this.run = function () {
+        this.health --;
+    }
+}
+var car1 = new Car();
+var car2 = new Car();
 ```
 
