@@ -454,11 +454,11 @@
   // 0123456789
   ```
 
-#### `typeof ()`操作符
+#### `typeof()`操作符
 
- `typeof ()`有 6 种返回值：`number` `string` `boolean` `object` `function` `undefined` 
+ `typeof()`有 6 种返回值：`number` `string` `boolean` `object` `function` `undefined` 
 
-> **注意：这6种返回值都是字符串类型。**
+> **注意：这6种返回值都是字符串类型的原始值。**
 >
 > ```js
 > typeof(undefined);
@@ -724,19 +724,6 @@ if (11 + "11" * 2 == 33) {
 
 
 
-```js
-AO{
-    a: 3;
-    b: 2;
-    c: 0;
-    d: function d(){};
-}
-
-// 122
-```
-
-
-
 # JavaScript运行三部曲
 
 JavaScript运行需要有三个步骤：
@@ -961,6 +948,111 @@ function bar(){
 // 输出：
 // 11
 ```
+
+3. 百度13年笔试题
+
+   下面这段js代码执行完毕后，x, y, z的值分别为多少？
+
+```js
+var x = 1, y = z = 0;
+function add(n) {
+    return n = n + 1;
+}
+y = add(x);
+function add(n) {
+    return n = n + 3;
+}
+z = add(x);
+// x:1 y:4 z:4
+```
+
+解析：
+
+1. 首先全局预编译：
+
+   ```js
+   GO {
+      x: undefined，
+      add: function add(n) {return n = n + 3},
+   }
+   ```
+
+2. 然后全局解释执行
+
+   - line 1 :
+
+     ```js
+     GO {
+         x: 1,
+         y: 0,
+         z: 0,
+         add: function add(n) {return n = n + 3},
+     }
+     ```
+
+   - line 2 - 4 预编译的时候已经声明过了
+
+   - line 5 执行`add`函数 （这个`add`函数是GO中的`add`函数），
+
+     - 进行该函数的预编译
+
+       ```js
+       AO {
+           n: 1,
+       }
+       ```
+
+     - 进行该函数的解释执行
+
+       ```js
+       AO {
+           n: 4,
+       }
+       ```
+
+       将`n`返回给`y`，并销毁该AO，此时GO变成了：
+
+       ```js
+       GO {
+           x: 1,
+           y: 4,
+           z: 0,
+           add: function add(n) {return n = n + 3},
+       }
+       ```
+
+   - line 6 - 8 预编译的时候已经声明过了
+
+   - line 9 执行`add`函数 （这个`add`函数是GO中的`add`函数），
+
+     - 进行该函数的预编译
+
+       ```js
+       AO {
+           n: 1,
+       }
+       ```
+
+     - 进行该函数的解释执行
+
+       ```js
+       AO {
+           n: 4,
+       }
+       ```
+
+       将`n`返回给`z`，并销毁该AO，此时GO变成了：
+
+       ```js
+       GO {
+           x: 1,
+           y: 4,
+           z: 4,
+           add: function add(n) {return n = n + 3},
+       }
+       ```
+
+3. 运行结束，此时x为1，y为4，z为4。
 
 ## 解释执行
 
@@ -1374,3 +1466,245 @@ var car1 = new Car();
 var car2 = new Car();
 ```
 
+#### 构造函数内部原理
+
+当使用`new`操作符的时候，会进行以下3个步骤：
+
+1. 在函数体最前面隐式的加上 `this = {}`
+2. 按构造函数内部的语句来执行`this.xxx = xxx`；
+3. 在函数体最后隐式的返回`this`
+
+例如下面的构造函数（注释中为`new`操作符的隐式操作内容）：
+
+```js
+function Person(name, age) {
+	// var this = {}
+    this.name = name;
+    this.age = age;
+    this.say = function () {
+        console.log("I am " + this.name);
+    }
+    // return this
+}
+var pers = new Person('tish', 18);
+console.log(pers.name);
+// 'tish'
+```
+
+> 由于使用`new`会隐式的返回`this`对象，所以如果在构造函数最后显式的return一个自定义的对象（或其他引用值，如数组），那么就会把`new`的隐式返回`this`覆盖掉，相当于捣乱= =。比如：
+>
+> ```js
+> function Person(name) {
+>     // var this = {};
+>     this.name = name;
+>     // return this
+>     return {};
+> }
+> var pers = new Person('tish')
+> console.log(pers)
+> // {}
+> ```
+>
+> **冷门小知识**：如果在构造函数最后显式的返回原始值的话，系统会自动将你返回的原始值给忽略而继续隐式返回`this`对象。比如：
+>
+> ```js
+> function Person(name) {
+>     // var this = {};
+>     this.name = name;
+>     return 123; // 123是原始值，会被自动忽略
+>     // return this;
+> }
+> var pers = new Person('tish')
+> console.log(pers)
+> // Person {name: 'tish'}
+> ```
+
+**对象和闭包结合的例题**
+
+```js
+function Person(name, age, sex){
+  var a = 0;
+  this.name = name;
+  this.age = age;
+  this.sex = sex;
+  function sss() {
+    a ++;
+    console.log(a);
+  }
+  this.say = sss;
+}
+var oPerson = new Person();
+oPerson.say(); // 1
+oPerson.say(); // 2
+var oPerson1 = new Person();
+oPerson1.say(); // 1
+```
+
+`new`会隐式的`return this`，因此构造函数的内部函数`function sss() {...}`被储存到了外部，形成闭包，变量`a`一直在`function sss() {...}`的作用域链中无法释放，因此每调用一次`say()`就会累加一次。
+
+新`new`的对象的作用域链会重新产生，因此与之前生成的对象相互独立。
+
+## 包装类
+
+- `new String(<字符串原始值>);`
+- `new Boolean(<布尔原始值>);`
+- `new Number(<数字原始值>);`
+
+原始值是没有属性及方法的，但是通过包装类可以给其添加属性和方法。比如：
+
+```js
+var num = 123;
+num.len = 3;
+console.log(num.len)
+// undefined
+var newNum = new Number(num);
+newNum.len = 3;
+console.log(newNum.len);
+// 3
+```
+
+**？**为什么原始值没有属性，但是上述代码中`num.len = 3`和`console.log(num.len)`并没有报错？
+
+答：**当某一语句调用原始值的属性和方法时**，由于其没有属性和方法，所以系统为了尽量少报错，**会隐式的调用包装类，将原始值变成对象供你使用，并在执行该语句结束后立即销毁该对象。**例如：
+
+```js
+var str = "a string";
+console.log(str.length);
+// 这一句会隐式转换成 console.log(new String(str).length), 然后销毁该String对象
+// 8
+
+str.length = 2；
+// 隐式转换成 new String(str).length = 2; 并销毁该String对象
+
+console.log(str.length);
+// 此时会再次隐式转换成 console.log(new String(str).length)，然后销毁该String对象
+// 8
+```
+
+由于每一次调用`str.length`所`new`出的String对象是相互独立不同的对象，所以最后会输出新产生的`String(‘a string’)`对象的长度为8，而非之前所赋值的 2，因为赋值时所用的String对象已经被销毁了。
+
+**例题**：写出以下代码的执行结果
+
+```js
+var str = "abc";
+str += 1;
+var test = typeof(str);
+if (test.length == 6) {
+    test.sign = "typeof的返回结果可能为String";
+}
+console.log(test.sign);
+```
+
+```js
+// 输出：
+// undefined
+```
+
+解析：由于`typeof(str)`的返回值是字符串类型的原始值，因此`test`是字符串原始值而第5行代码是对原始值进行属性赋值，因此会隐式调用包装类进行赋值（即相当于`new String(test).sign = “....”`），而在该语句结束之后就立即销毁了该String对象，因此第7行输出的时候，隐式调用包装类成`console.log(new String(test).sign)`，相当于新创建了一个String对象并访问其sign属性，该String没有sign属性，故返回`undefined`。
+
+
+
+# 练习题
+
+## 阿里的题
+
+1. 下面代码中`console.log`的结果是[1,2,3,4,5]的是：
+
+   ```js
+   // 选项A
+   function foo(x) {
+       console.log(arguments);
+       return x;
+   }
+   foo(1,2,3,4,5);
+   // [1,2,3,4,5]
+   
+   // 选项B
+   function foo(x) {
+       console.log(arguments);
+       return x;
+   }(1,2,3,4,5)
+   // 啥都没有，系统会把function和后面的(1,2,3,4,5)分开，因此只声明了函数而没有执行。
+   
+   // 选项C
+   (function foo(x) {
+       console.log(arguments);
+       return x;
+   }(1,2,3,4,5))
+   // 立即执行函数
+   // [1,2,3,4,5]
+   
+   // 选项D
+   function foo(){
+       bar.apply(null, arguments)
+   }
+   function bar(x){
+       console.log(arguements)
+   }
+   foo(1,2,3,4,5)
+   // [1,2,3,4,5]
+   ```
+
+2. 请问以下表达式的结果是什么？
+
+   ```js
+   parseInt(3, 8)  // 3
+   parseInt(3, 2)  // NaN
+   parseInt(3, 0)  // NaN/3 (chrome浏览器里parseInt传入的进制为0时，会将传入值直接输出，有些浏览器则会传出NaN)
+   ```
+
+3. 以下哪些是JavaScript语言`typeof`可能返回的结果
+
+   ```js
+   'string' // √
+   'array'  // ×
+   'object' // √
+   'null'   // ×
+   ```
+
+   `typeof`的6中传出值：`'string'` `'number'` `'boolean'` `'function'` `'object'` `'undefined'`
+
+4. 看看下面`alert`的结果是什么
+
+   ```js
+   function b(x, y, a) {
+       arguments[2] = 10;
+       alert(a);
+   }
+   b(1,2,3);
+   // 10
+   ```
+
+   如果函数体改成下面的，结果又会是什么？
+
+   ```js
+   function b(x, y, a) {
+       a = 10;
+       alert(arguments[2]);
+   }
+   b(1,2,3);
+   // 10
+   ```
+
+   因为`a`与`arguments[2]`是相互映射的。
+
+5. 写一个方法，求一个字符串的字节长度。（提示：字符串有一个方法`charCodeAt()`；一个中文占两个字节，一个英文占一个字节。
+
+   `charCodeAt()`方法可以返回指定位置的字符的Unicode编码，这个返回值是0-65535之间的整数。（当返回值是<=255时，为英文，反之为中文）
+
+   语法为：`stringObject.charCodeAt(index)`
+
+   ```js
+   function byteLen(str) {
+       var count, len;
+       	count = len = str.length;
+       for (var i = 0; i < len; i ++) {
+           if (str.charCodeAt(i) > 255) {
+               count ++;
+           }
+       }
+       return count;
+   }
+   ```
+
+   
