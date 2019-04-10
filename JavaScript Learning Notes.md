@@ -1602,6 +1602,85 @@ console.log(test.sign);
 
 解析：由于`typeof(str)`的返回值是字符串类型的原始值，因此`test`是字符串原始值而第5行代码是对原始值进行属性赋值，因此会隐式调用包装类进行赋值（即相当于`new String(test).sign = “....”`），而在该语句结束之后就立即销毁了该String对象，因此第7行输出的时候，隐式调用包装类成`console.log(new String(test).sign)`，相当于新创建了一个String对象并访问其sign属性，该String没有sign属性，故返回`undefined`。
 
+## 原型
+
+### 定义
+
+原型是function对象的一个属性`funcName.prototype`，它定义了构造函数制造出的对象的公共祖先。通过该构造函数产生的对象，可以继承该原型的属性和方法。原型也是对象。
+
+利用原型特点和概念，可以提取共有属性。
+
+```js
+Car.prototype.carName = "BMW";
+Car.prototype.height = 1400;
+Car.prototype.long = 4900;
+// or 
+// Car.prototype = {
+//  	carName: "BMW",
+//      height: 1400,
+//      long: 4900
+// }
+function Car(color, owner) {
+  this.owner = owner;
+  this.color = color;
+}
+var car = new Car('red', 'tishacy')
+console.log(car);
+```
+
+### 原型的增、删、改、查
+
+```js
+Person.prototype.age = 18;
+function Person() {
+    this.name = "li"
+}
+var pers = new Person();
+```
+
+- 增：`Person.prototype.lastName = 'Tim';`
+- 删：`delete Person.prototype.age;`
+- 改：`Person.prototype.lastName = 'Tishacy';`
+- 查：`var pers = new Person(); console.log(pers.lastName);`
+
+### 对象如何查看其原型和构造函数
+
+```js
+Person.prototype.lastName = 'Tim'
+function Person(name, age) {
+    this.name = name;
+    this.age = age;
+}
+var pers = new Person('tishacy', 18);
+```
+
+- **查看原型**：使用`__proto__`隐式属性可以查看对象的`prototype`（原型对象）：
+
+  ```js
+  console.log(pers.__proto__);
+  // {lastName: "Tim", constructor: f}
+  ```
+
+- **查看构造函数**：使用`constructor`属性可以查看对象的构造函数：
+
+  ```js
+  console.log(pers.constructor);
+  // ƒ Person(name, age) {
+  //    this.name = name;
+  //    this.age = age;
+  // }
+  ```
+
+
+
+
+
+
+
+
+
+
+
 
 
 # 练习题
