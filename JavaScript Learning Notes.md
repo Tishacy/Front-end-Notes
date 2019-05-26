@@ -1441,6 +1441,8 @@ var obj = {
 
 #### 系统自带的构造函数 `Object()`
 
+>  这种方法百年不遇，用得非常少。
+
 ```js
 var obj = new Object();
 obj.name = "Tishacy";
@@ -1449,7 +1451,7 @@ obj.eat = function () {console.log("I am eating.")};
 
 #### 自定义构造函数
 
-自定义构造函数与普通函数在结构上没有任何区别，但是为了区分，对象的构造函数使用大驼峰式的命名方式（如：`TheFirstObject`），而函数使用小驼峰式的命名方式（如：`theFirstObject`）。
+自定义构造函数与普通函数在结构上没有任何区别，但是为了区分，对象的构造函数使用大驼峰式的命名方式（如：`TheFirstObject`），而函数使用小驼峰式的命名方式（如：`theFirstFunction`）。
 
 ```js
 function Car() {
@@ -1671,13 +1673,417 @@ var pers = new Person('tishacy', 18);
   // }
   ```
 
+**练习**：
+
+```js
+// 1.
+function Person() {
+    // this = {
+    //	 __proto__: Person.prototype;
+	// }
+};
+Person.prototype.name = "tishacy";
+var pers = new Person();
+console.log(pers.name);
+// tishacy
+```
+
+**解析**：给`Person`的原型`Person.__proto__`（也就是`Person.prototype`）赋上`name`属性为`‘tishacy’`。在`new Person() `以后，访问`Person`的`name`属性，由于`Person`没有`name`属性，所以会从其原型中找出`name`属性，并显示出来。
+
+```js
+// 2.
+function Person() {
+    // this = {
+    //	 __proto__: Person.prototype;
+	// }
+};
+Person.prototype.name = "tishacy";
+Person.prototype.name = "chayatish"
+var pers = new Person();
+console.log(pers.name);
+// chayatish
+```
+
+**解析**：在`new Person()`之前更改其原型的`name`属性值，访问时会得到更改后的`name`值。
+
+```js
+// 3.
+function Person() {
+    // this = {
+    //	 __proto__: Person.prototype;
+	// }
+};
+Person.prototype.name = "tishacy";
+var pers = new Person();
+Person.prototype.name = "chayatish";
+console.log(pers.name);
+// chayatish
+```
+
+**解析**：在`new Person()`之后更改其原型的`name`属性值，更改后访问`name`会得到更改后的`name`值。原因是`Person.prototype.name`是一个原始值，给原始值重新赋值只会将其在原有的内存空间中覆盖掉，因此会得到覆盖后的`name`属性。
+
+```js
+// 4.
+function Person() {
+    // this = {
+    //	 __proto__: Person.prototype;
+	// }
+};
+Person.prototype.name = "tishacy";
+Person.prototype = {name: "chayatish"};
+var pers = new Person();
+console.log(pers.name);
+// chayatish
+```
+
+**解析**：在`new Person()`之前更改原型`Person.prototype`为一个新的对象，则`new Person()`得到的是拥有新的原型的对象，然后访问`name`属性，会从新的原型中找到`name`，得到`‘chayatish’`。
+
+```js
+// 5.
+function Person() {
+    // this = {
+    //	 __proto__: Person.prototype;
+	// }
+};
+Person.prototype.name = "tishacy";
+var pers = new Person();
+Person.prototype = {name: "chayatish"};
+console.log(pers.name);
+// tishacy
+```
+
+**解析**：在`new Person()`之后更改原型`Person.prototype`为一个新的对象，由于`Person.prototype`是一个引用值而非原始值，因此重新赋值的话会将`Person.__proto__`指向另一个内存空间，而不是覆盖原有的内存空间。因此，`pers`仍然用的是原来的`pers.__proto__`，访问`pers.name`会得到`‘tishacy’`。
+
+ 
+
+## 原型链
+
+```js
+Grand.prototype.lastName = "Deng";
+function Grand(){
+    
+};
+var grand = new Grand();
+
+Father.prototype = grand;
+function Father() {
+    this.name = "xuming";
+};
+var father = new Father();
+
+Son.prototype = father;
+function Son() {
+    this.hobby = "smoke";
+};
+var son = new Son();
+
+// test
+console.log(son.hobby); // "smoke"
+console.log(son.name);  // "xuming"
+console.log(son.lastName); // "Deng"
+```
+
+该原型链为：
+
+​	`Object.prototype` –> `Grand` –> `Father` –> `Son`
+
+其中Object.prototyep为**大多数对象**的原型链的顶端。访问某一对象的属性时，如果该对象不存在该属性，就会沿着该对象的原型链自末端向顶端依次查找该属性，直至找到为止。
 
 
 
+### 原型链上属性的增删改查
+
+**练习**:
+
+```js
+Person.prototype = {
+    name: "a",
+    sayName: function () {
+        console.log(this.name);
+    }
+}
+function Person () {
+    this.name = "b";
+}
+var pers = new Person();
+console.log(pers.sayName());
+// "b"
+```
+
+**解析**：
+
+- *小知识点* ：`obj.method()`中的`method`里面的`this`的指向是，谁调用这个`method`，`this`就指向谁。
+
+`pers.sayName()`时`sayName`中的`this`指的就是`pers`，因此会返回`pers.name`，即`”b“`。
+
+**练习**：
+
+```js
+Person.prototype = {
+    height: 100,
+}
+function Person () {
+    this.say = function () {
+        this.height ++;
+    }
+}
+var pers = new Person();
+pers.say();
+console.log(pers.height); // 101
+console.log(pers.__proto__.height); // 100
+```
+
+**解析** ：
+
+- 原型的属性值如果是原始值，那一定无法修改覆盖；如果是引用值，那么可以通过访问引用值再对引用值进行修改。
+- `pers.say()`时，调用`this.height++`相当于`this.height = this.height + 1`，即先取出`this.height`，由于`pers`自身没有`height`属性，从其原型中找到`height`属性为`100`，然后`100+1`后再赋值给`this.height`，就是`pers.height=101`，而其原型的`height`值并不改变。
+- 对`__proto__`和`prototype`的区分：
+  - `prototype`是针对构造函数的，使用时是`Func.prototype`，比如`Person.prototype = {name: "tishacy"}`;
+  - `__proto__`是针对对象实例的，使用时是`obj.__proto__`，比如`console.log(pers.__proto__.height)`。
+
+ 
+
+### `Object.create()`
+
+- 如果想让对象`b`的原型为`a`，可以使用：
+
+  ```js
+  var b = Object.create(a);
+  ```
+
+  此时，`b.__proto__`就是`a`，其中`a`有两种值，一种是对象，另一种是`null`。
+- 原型为对象：
+
+    ```js
+    Person.prototype.name = "sunny";
+    function Person() {};
+
+    var pers = Object.create(Person.prototype); // 用Person的原型来构造对象
+    // 由于构造函数Person中是空的，因此上面的方法完全等同于：
+    var pers = Person();
+    ```
+
+    ```js
+    function Father() {
+        this.lastName = "Deng";
+    }
+    var father = new Father();
+    var son = Object.create(father);
+    // 即以对象father为原型来创建对象son
+    ```
+
+- 原型为`null`：
+
+  ```js
+  var firstMan = Object.create(null);
+  // 此时firstMan没有原型
+  ```
+
+- 以对象为原型和以`null`为原型的区别：
+
+  - 使用`Object.create(obj)`时，其创建的对象具有`__proto__`属性，即有原型，其原型链沿着`__proto__`属性向前追溯即可。
+  - 使用`Object.create(null)`时，其创建的对象没有任何属性，即没有原型，其原型链的终端为自身。
+  - **因此，不是所有的对象的原型链的终端都是`Object.prototype`，如果原型链中存在某一个对象是`Object.create(null)`来创建的，那么该对象就是原型链的终端，否则原型链的终端就是`Object.prototype`。**
 
 
 
+## `call`和`apply`
 
+- **`call`** : 所有的方法（函数）都有`call`方法，**`call`的作用是改变`this`的指向，其应用就是使用别人的函数来实现自己的功能。**
+
+  - 基本用法：
+
+    - 不传参时：`method.call()`等同于`method()`，即使函数执行。
+
+        ```js
+        function say() {
+            console.log("hello");
+        }
+        say(); // hello
+        say.call(); // hello
+        ```
+
+    - 传参时，`method.call(obj, arguments)`，将`method`中的`this`的指向变为传入的第一个参数`obj`，然后执行`method`函数。
+
+      **例子**：
+
+      ```js
+      function say(txt) {
+          console.log(txt);
+      }
+      say.call(say, "hello") // hello
+      ```
+
+      ```js
+      // 有一个初始化函数init
+      function init(name, age, gender) {
+          this.name = name;
+          this.age = age;
+          this.gender = gender;
+      }
+      // 有一个空对象obj
+      var obj = {};
+      // 让obj使用init函数来初始化自己
+      init.call(obj, "tishacy", 18, "male");
+      // 此时是将init函数中的this指向了obj，再调用init函数
+      // 相当于obj用了别人的函数来做了自己的事情
+      console.log(obj);
+      // {name: 'tishacy', age: 18, gender: 'male'}
+      ```
+
+      ```js
+      function Person(name, age, gender) {
+          this.name = name;
+          this.age = age;
+          this.gender = gender;
+      }
+      function Student(name, age, gender, tel, grade) {
+          // 将Person函数中的this指向Student中的this，
+          // 然后调用Person函数来执行自己的功能
+          Person.call(this, name, age, gender);
+          this.tel = tel;
+          this.grade = grade;
+      }
+      var student = new Student("tish", 18, 'male', 139, 2015);
+      console.log(student);
+      // {name: 'tishacy', age: 18, gender: 'male', tel: 139, grade: 2015}
+      ```
+
+      ```js
+      // 一些组件
+      function Wheel(wheelSize, style) {
+          this.style = style;
+          this.wheelSize = wheelSize;
+      }
+      function Sit(c, sitColor) {
+          this.c = c;
+          this.sitColor = sitColor;
+      }
+      function Model(height, width, len) {
+          this.height = height;
+          this.width = width;
+          this.len = len;
+      }
+      // 总调度
+      function Car(wheelSize, style, c, sitColor, height, width, len) {
+      	Wheel.call(this, wheelSize, style);
+          Sit.call(this, c, sitColor);
+          Model.call(this, height, width, len);
+      }
+      ```
+
+- **`apply`**: **与`call`的作用一样**，用于改变`this`的指向，用别人的方法来实现自己的功能，**只有传参列表不一样**。
+
+  - `method.call(obj, arg1, arg2, ..., argn)`
+
+  - `method.apply(obj, [arg1, arg2, ..., argn])`
+
+    
+
+## 继承模式
+
+- 共有原型
+
+  ```js
+  Father.prototype.lastName = "Deng";
+  function Father() {}
+  function Son() {}
+  // 让Son的原型继承自Father的原型
+  Son.prototype = Father.prototype;
+  
+  var father = new father;
+  var son = new Son;
+  console.log(father.lastName); // Deng
+  console.log(son.lastName); //Deng
+  ```
+
+  ```mermaid
+  graph LR
+  A[Father.prototype]-->B(Father)
+  A[Father.prototype]-->C(Son)
+  ```
+
+  ```js
+  // 封装成“继承”函数
+  function inherit(Target, Origin) {
+      Target.prototype = Origin.prototype;
+  }
+  inherit(Son, Father);
+  ```
+
+  **注意**：这样进行继承会有一个问题，就是如果改变`Son.prototype`，那么`Father.prototype`也会发生变化，比如：
+
+  ```js
+  Father.prototype.name = "Deng";
+  function Father(){};
+  function Son(){};
+  Son.prototype = Father.prototype; // 继承
+  
+  // 改变Son.prototype
+  Son.prototype.name = "Tish";
+  var son = new Son();
+  var father = new Father();
+  console.log(son.name); // Tish
+  console.log(father.name); // Tish
+  ```
+
+  真正的继承应当是，当A继承自B的原型之后，A拥有B的原型中的属性和方法，并且改变A的原型并不影响B的原型。因此，使用下面的继承方法更为妥当。
+
+- （圣杯模式）中间层缓冲的共有原型
+
+  ```js
+  Father.prototype.name = "Deng"
+  function Father() {};
+  function Mid() {};
+  function Son() {};
+  
+  Mid.prototype = Father.prototype; // Mid继承自Father的原型
+  Son.prototype = new Mid();  // 创建一个空Mid()对象作为Son的原型，该对象具有Father的原型，同时改变该对象（Son.prototyep）的属性不会影响Father.prototype.
+  
+  // test
+  Son.prototype.name = "Tish"
+  var son = new Son();
+  var father = new Father();
+  console.log(son.name); // Tish
+  console.log(father.name); // Deng
+  ```
+
+  ```mermaid
+  graph LR
+  Father.prototype-->Mid
+  Mid-->Son
+  Father.prototype-->Father
+  ```
+
+  ```js
+  function inherit(Target, Origin) {
+      function Mid() {};
+      Mid.prototype = Origin.prototype;
+      Target.prototype = new Mid();
+      Target.prototype.constructor = Target;
+      Target.prototype.uber = Origin.prototype;
+  }
+  inherit(Son, Father);
+  ```
+
+  为了让中间函数`Mid()`成为私有化函数，利用闭包，形成更加高级的继承方法：
+
+  ```js
+  function inherit = (function (){
+      var Mid = function (){};
+      return function (Target, Origin) {
+          Mid.prototype = Origin.prototype;
+          Target.prototype = new Mid();
+          Target.prototype.constructor = Target;
+          Target.prototype.uber = Origin.prototype;
+      }
+  }());
+  inherit(Son, Father);
+  ```
+
+  
+
+   
 
 
 
