@@ -2105,11 +2105,199 @@ console.log(son.smoke); // undefined
   inherit(Son, Father);
   ```
 
+###  命名冲突问题的解决
+
+当一个页面需要多人开发的时候，会出现多个人的变量、函数命名冲突的问题。有两种解决方式，第一种比较老，使用命名空间，第二种是使用闭包解决。
+
+#### 命名空间
+
+定义一个全局的命名空间对象`org`来存储各人定义的所有变量和函数。
+
+```js
+org = {
+    department1: {				// 部门1
+        xiaohei: {				// 小黑的命名空间	
+            name: "hei",
+            age: 18,
+            say: function () {console.log(this.name)}
+        },
+        xiaoming: {				// 小明的命名空间
+            name: "ming",
+            age: 20,
+            say: function () {console.log(this.name)}
+        }
+    },
+    department2: {				// 部门2
+        xiaohong: {				// 小红的命名空间
+            // ...
+        },
+        xiaohua: {				// 小花的命名空间
+            // ...
+        },
+    }
+}
+```
+
+用以下方法调用命名空间中的变量和函数：
+
+```js
+var hei = org.department1.xiaohei;
+var ming = org.department2.xiaoming;
+console.log(hei.name);		// "hei"
+console.log(hei.say()); 	// "hei"
+console.log(ming.name); 	// "ming"
+console.log(ming.say());	// "ming"
+```
+
+这样多个人写的代码即使有相同的命名也可以互不影响。但是由于命名空间写起来和调用比较繁琐，所以现在几乎不用了，而是使用闭包的方式解决命名冲突问题。
+
+#### 闭包的解决
+
+使用立即执行函数，将所实现的功能包裹起来，返回总功能函数，来实现功能内部的变量和函数的私有化，避免污染全局变量。
+
+```js
+var task1 = (function (){
+    var name = 'hei';
+    var callName = function(){
+        console.log(name);
+    }
+    return function() {
+        callName();
+    }
+}());
+
+var task2 = (function (){
+    var name = 'ming';
+    var callName = function(){
+        console.log(name);
+    }
+    return function() {
+        callName();
+    }
+}());
+```
+
+一个人使用`task1`来定义自己需要的变量和函数，另一个人使用`task2`来定义自己需要的变量和函数，通过使用闭包来使其变量和函数私有化，这样两个人的命名即使一样也不会相互影响。
+
+### 对象的方法的连续调用
+
+实现`obj.method1().method2()`，只需要在`method1`、`method2`中`return this`即可。比如：
+
+```js
+var person = {
+    name: "Tishacy",
+    say: function (words){
+        console.log(words);
+        return this;
+    },
+    drink: function (){
+        console.log(this.name + " is drinking");
+        return this;
+    }
+}
+
+person.say("Hello").drink();
+// Hello
+// Tishacy is drinking.
+```
+
+### 对象枚举
+
+遍历对象的所有属性要用到`for in`循环：
+
+```js
+var obj = {
+    name: "tishacy",
+    age: 18,
+    sex: "male",
+    __proto__: {
+        lastName: "Tim",
+    }
+}
+
+for (var prop in obj) {
+    console.log(prop + " " + obj[prop]);
+}
+// name tishacy
+// age 18
+// sex male
+// lastName Tim
+```
+
+- **`obj.hasOwnProperty(propName)`**
+
+  ```
+  obj.hasOwnProperty(propName)
+  判断某一对象obj是否有某属性（不包含原型中的属性）
+  param:
+  	propName: 属性名
+  return:
+  	true: 如果obj中有该属性，并且不在原型中
+  	false: 如果obj中没有该属性，或者该属性在原型中
+  ```
+
+  `for (var prop in obj)`会将`obj`中所有自设的属性都遍历出来，包括给原型中自设的属性。为了过滤调原型中的属性，仅要对象中的属性，可以使用`obj.hasOwnProperty("属性名")`。
+
+    ```js
+    for (var prop in obj) {
+        if (obj.hasOwnProperty(prop)) {
+            console.log(prop + " " + obj[prop]);
+        }
+    }
+    // name tishacy
+    // age 18
+    // sex male
+    ```
+
+- **`A instanceof B`**
+
+  ```
+  A instanceof B
+  判断A对象是否是B构造函数构造出来的，
+  也就是判断A对象的原型链中是否存在B的原型。
+  ```
+
+  ```js
+  [] instanceof Array;		// true
+  [] instanceof Object;		// true
+  123 instanceof Number;		// true
+  "123" instanceof String;	// true
+  ```
+
+  **例子**：假如`function check(input)`传入的`input`既有可能是对象，也有可能是数组。对传入的`input`进行判断，并针对其类型来进行操作。
+
+  ```js
+  // 方法 1：instanceof
+  function check(input) {
+      if (input instanceof Array) {
+          // 处理数组
+      }else {
+          // 处理对象
+      }
+  }
   
+  // 方法 2：Object.prototype.toString.call()
+  function check(input) {
+      if (Object.prototype.toString.call(input) === "[object Array]") {
+          // 处理数组
+      }else{
+          // Object.prototype.toString.call(input) === "[object Object]"
+          // 处理对象
+      }
+  }
+  
+  // 方法 3: constructor
+  function check(input) {
+      if (input.constructor === Array) {
+          // 处理数组
+      }else{
+          // input.constructor === Object
+          // 处理对象
+      }
+  }
+  ```
 
-   
-
-
+  
 
 
 
