@@ -1141,8 +1141,8 @@ function a () {
         var bbb = 234;
         console.log(aaa);
     }
-    var aaa = 123;
-    return b;
+    var aaa = 123; // 函数内部变量
+    return b; // 传出内部函数（内部函数使用了内部变量aaa）
 }
 var demo = a();
 demo();
@@ -1263,7 +1263,7 @@ function eater() {
 
 var eater1 = eater();
 eater1.push("banana");
-eater1.eat();
+eater1.eat(); // I am eating banana
 ```
 
 ## 立即执行函数
@@ -1309,7 +1309,7 @@ console.log(x);
 // 1undefined
 ```
 
-`(function f(){})`构成一个表达式，该表达式执行完了就消失了，因此`f`变成未定义的量，而正常情况下引用未定义的量会报错，而`typeof`是唯一一个使用未引用的量而不报错的情况，因此输出`‘1undefined’`。
+`function f(){}`是函数声明，加括号之后`(function f(){})`构成一个表达式，该表达式执行完了就消失了，因此`f`变成未定义的量，而正常情况下引用未定义的量会报错，而`typeof`是唯一一个使用未引用的量而不报错的情况，因此输出`‘1undefined’`。
 
 ##  闭包的常见触发及解决
 
@@ -1787,7 +1787,7 @@ console.log(son.lastName); // "Deng"
 
 ​	`Object.prototype` –> `Grand` –> `Father` –> `Son`
 
-其中Object.prototyep为**大多数对象**的原型链的顶端。访问某一对象的属性时，如果该对象不存在该属性，就会沿着该对象的原型链自末端向顶端依次查找该属性，直至找到为止。
+其中Object.prototype为**大多数对象**的原型链的顶端。访问某一对象的属性时，如果该对象不存在该属性，就会沿着该对象的原型链自末端向顶端依次查找该属性，直至找到为止。
 
 
 
@@ -1835,7 +1835,7 @@ console.log(pers.__proto__.height); // 100
 
 **解析** ：
 
-- 原型的属性值如果是原始值，那一定无法修改覆盖；如果是引用值，那么可以通过访问引用值再对引用值进行修改。
+- 如果某对象的原型的属性值是原始值，那么该对象一定无法通过自己的方法来修改覆盖原型的属性；如果是引用值，那么可以通过访问引用值再对引用值进行修改。
 - `pers.say()`时，调用`this.height++`相当于`this.height = this.height + 1`，即先取出`this.height`，由于`pers`自身没有`height`属性，从其原型中找到`height`属性为`100`，然后`100+1`后再赋值给`this.height`，就是`pers.height=101`，而其原型的`height`值并不改变。
 - 对`__proto__`和`prototype`的区分：
   - `prototype`是针对构造函数的，使用时是`Func.prototype`，比如`Person.prototype = {name: "tishacy"}`;
@@ -1903,7 +1903,7 @@ console.log(pers.__proto__.height); // 100
         say.call(); // hello
         ```
 
-    - 传参时，`method.call(obj, arguments)`，将`method`中的`this`的指向变为传入的第一个参数`obj`，然后执行`method`函数。
+    - 传参时，`method.call(obj, arguments)`，将`method`中的`this`的指向变为传入的第一个参数`obj`，然后执行`method`函数。即相当于：`method`帮`obj`完成`method`中的功能。
 
       **例子**：
 
@@ -1982,7 +1982,31 @@ console.log(pers.__proto__.height); // 100
 
 ## 继承模式
 
-- 共有原型
+继承（`inherit(Target, Origin)`）就是让构造函数`Target`继承另一构造函数`Origin`的原型，即使得`Target`和`Origin`的`prototype`都变成`Origin.prototype`。
+
+**注意**：构造函数`Target`只是继承`Origin`的原型，并不继承构造函数`Origin`中的属性和方法，比如：
+
+```js
+Father.prototype.lastName = "Deng";
+function Father() {
+    this.money = 10000;
+    this.smoke = function (){
+        console.log("I am smoking.");
+    }
+};
+function Son() {};
+inherit(Son, Father);
+
+var son = new Son();
+var father = new Father();
+console.log(son.lastName); // "Deng"
+console.log(son.money); // undefined
+console.log(son.smoke); // undefined
+```
+
+### 继承的实现方法
+
+- **共有原型**
 
   ```js
   Father.prototype.lastName = "Deng";
@@ -2029,7 +2053,7 @@ console.log(pers.__proto__.height); // 100
 
   真正的继承应当是，当A继承自B的原型之后，A拥有B的原型中的属性和方法，并且改变A的原型并不影响B的原型。因此，使用下面的继承方法更为妥当。
 
-- （圣杯模式）中间层缓冲的共有原型
+- **（圣杯模式）中间层缓冲的共有原型**
 
   ```js
   Father.prototype.name = "Deng"
@@ -2049,9 +2073,9 @@ console.log(pers.__proto__.height); // 100
   ```
 
   ```mermaid
-  graph LR
-  Father.prototype-->Mid
-  Mid-->Son
+  graph TD
+  Father.prototype--Mid.prototype = Father.prototype-->Mid
+  Mid--"Son.prototype = new Mid();"-->Son
   Father.prototype-->Father
   ```
 
