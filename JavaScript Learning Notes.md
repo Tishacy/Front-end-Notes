@@ -2368,8 +2368,6 @@ b.say = a.say;
 b.say();		// '333'
 ```
 
-
-
 ```js
 var foo = 123;
 function print() {
@@ -2446,7 +2444,21 @@ test();
 
 
 
-## 克隆（拷贝）
+## 对象的克隆（拷贝）
+
+> 此处的克隆仅考虑对象中属性的克隆，而不考虑方法的克隆。
+
+```js
+function clone(origin, target) {
+    // ...
+}
+obj = {name: "abc"};
+obj1 = {};
+clone(obj, obj1)
+```
+
+- 浅拷贝：将对象`origin`中的属性克隆给对象`target`，修改`origin`（或`target`）的属性，如果该属性是原始值，则`target`（或`origin`）的属性值不变化，如果该属性是引用值，那么`target`和`origin`的属性一起变。
+- 深拷贝：将对象`origin`中的属性克隆给对象`target`，修改`origin`（或`target`）的属性，不管该属性是原始值还是引用值，另一方的属性都不会发生变化。
 
 ### 浅拷贝
 
@@ -2463,7 +2475,9 @@ function clone(origin, target) {
     // 将origin的属性全部克隆给target
     var target = target || {};
     for (var prop in origin) {
-        target[prop] = origin[prop];
+        if origin.hasOwnProperty(prop) {
+            target[prop] = origin[prop];
+        }
     }
     return target;
 }
@@ -2558,9 +2572,49 @@ function deepClone(origin, target) {
 }
 ```
 
+# 数组
 
+## 数组的定义
 
+- 字面量定义数组
 
+  ```js
+  var arr = [1,2,3,4,5];
+  ```
+
+- 使用系统构造函数来定义数组
+
+  `new Array()`
+
+  - 如果传参列表`arguments`的长度大于1，那么将`arguments`中的值作为数组的值，得到数组；
+  - 如果只传入了1个参数，那么将传入的参数作为数组的长度来创建数组，数组中的值均为`undefined`。
+
+  ```js
+  // 创建一个含有 1,2,3,4,5 五个值的数组
+  var arr = new Array(1,2,3,4,5);
+  console.log(arr);	// [1,2,3,4,5]
+  
+  // 创建一个长度为5的数组
+  var arr = new Array(5);
+  console.log(arr);	// [undefined × 5];
+  ```
+
+## 数组的读写
+
+- **读**：`arr[num]` 溢出读时，结果是`undefined`
+
+- **写**：`arr[num] = xxx;` 可以溢出写，如果溢出写，则会用`undefined`自动填充到前面的空位，比如：
+
+  ```js
+  var arr = [];
+  arr[5] = 5;
+  console.log(arr);
+  // [undefined × 5, 5]
+  ```
+
+  
+
+  
 
 
 
@@ -2685,3 +2739,4 @@ function deepClone(origin, target) {
    解析：JS中逗号操作符`,`有一个功能，当多个值用逗号操作符连接时，会返回最后一个值，比如`(1,2,3,4,5)`会返回`5`。因此，上述代码中第1行至第4行相当于`var f = (function g(){return 2})();` 即使函数`g`立即执行吼赋值给变量`f`，此时`f=2`，故`typeof f`为`"number"`。 
 
    
+
