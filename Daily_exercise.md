@@ -67,9 +67,43 @@
 
    
 
-3. 
+3. 以下代码的输出是什么？解释你的答案。
 
-   
+   ```js
+   var a = {},
+       b = {key: 'b'},
+       c = {key: 'c'};
+   a[b] = 123;
+   a[c] = 456;
+   console.log(a[b]);
+   ```
+
+   知识点：对象的属性访问与赋值
+
+   解析：
+
+   访问对象的属性有两种方式，一种是`obj.prop`，另一种是`obj[str(prop)]`。
+
+   - 其中`obj.prop`会隐式的将`prop`使用`toString()`方法转化成为字符串类型`str(prop)`，然后再调用`obj[str(prop)]`。
+   - 使用`obj[prop]`时，如果`prop`不是字符串，那么也会隐式调用`toString()`方法转化为字符串类型的`str(prop)`，再调用`obj[str(prop)]`。
+
+   因此，第4行的`a[b]`相当于`a[b.toString()]`，由于`b`是对象，则`b.toString()`为`"[object Object]"`，即相当于`a["[object Object]"]=123`，此时`a`为：
+
+   ```js
+   a = {
+       "[object Object]": 123,
+   }
+   ```
+
+   同理，第5行的`a[c]-->a[c.toString()]-->a["[object Object]"]`，并赋值为``456`，将原`"[object Object]"`属性值覆盖成了`456`。
+
+   ```js
+   a = {
+       "[object Object]": 456,
+   }
+   ```
+
+   因此，第6行`console.log(a[b])`相当于`console.log(a["object Object"])`得到`456`。
 
    
 
