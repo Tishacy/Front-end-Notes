@@ -34,18 +34,42 @@
        }
        console.log(x);
        console.log(y);
-   })
+   })();
    ```
 
    执行结果为：
 
-   ```
-   
+   ```js
+   1
+   undefined
+   2
    ```
 
-   知识点：
+   知识点：预编译、作用域链、`with`和`catch`对作用域链的改变
 
    解析：
+
+   1. 函数预编译：在函数预编译时，`var`语句被挂起（不包含值的初始化）到它所属的全局或函数作用域的顶部。即：
+
+      ![](./Notes Images/exercise 2-1.png)
+
+   2. **`with`与`catch`内的在执行时，其执行期上下文的作用域会被临时改变**，生成了一个新的可变对象并推入作用域链的头部，此时函数原本的局部变量现在处于第二个作用域链对象中。见下图：
+
+      ![](./Notes Images/exercise 2-2.png)
+
+      此时，第六行的`console.log(x)`从临时对象`catch variable object`中索取`x`，输出1。
+
+   3. `catch`语句执行结束后，catch临时生成的可变对象被销毁，此时作用域链的顶端为函数的AO，如下图：
+
+      ![](./Notes Images/exercise 2-3.png)
+
+      此时，第8行和第9行分别输出`x`和`y`的值，得到`undefined`和`2`。
+
+   
+
+3. 
+
+   
 
    
 
