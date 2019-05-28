@@ -2105,11 +2105,11 @@ console.log(son.smoke); // undefined
   inherit(Son, Father);
   ```
 
-###  命名冲突问题的解决
+##  命名冲突问题的解决
 
 当一个页面需要多人开发的时候，会出现多个人的变量、函数命名冲突的问题。有两种解决方式，第一种比较老，使用命名空间，第二种是使用闭包解决。
 
-#### 命名空间
+### 命名空间
 
 定义一个全局的命名空间对象`org`来存储各人定义的所有变量和函数。
 
@@ -2151,7 +2151,7 @@ console.log(ming.say());	// "ming"
 
 这样多个人写的代码即使有相同的命名也可以互不影响。但是由于命名空间写起来和调用比较繁琐，所以现在几乎不用了，而是使用闭包的方式解决命名冲突问题。
 
-#### 闭包的解决
+### 闭包的解决
 
 使用立即执行函数，将所实现的功能包裹起来，返回总功能函数，来实现功能内部的变量和函数的私有化，避免污染全局变量。
 
@@ -2179,7 +2179,7 @@ var task2 = (function (){
 
 一个人使用`task1`来定义自己需要的变量和函数，另一个人使用`task2`来定义自己需要的变量和函数，通过使用闭包来使其变量和函数私有化，这样两个人的命名即使一样也不会相互影响。
 
-### 对象的方法的连续调用
+## 对象的方法的连续调用
 
 实现`obj.method1().method2()`，只需要在`method1`、`method2`中`return this`即可。比如：
 
@@ -2201,7 +2201,7 @@ person.say("Hello").drink();
 // Tishacy is drinking.
 ```
 
-### 对象枚举
+## 对象枚举
 
 遍历对象的所有属性要用到`for in`循环：
 
@@ -2297,7 +2297,252 @@ for (var prop in obj) {
   }
   ```
 
-  
+
+
+## `this`
+
+1. 函数预编译过程`this`指向`window`
+
+   ```js
+   (function f(){
+       console.log(this);
+   }());
+   // Window {...}
+   ```
+
+2. 全局作用域里`this`指向`window`
+
+   ```js
+   console.log(this);
+   // Window {...}
+   ```
+
+3. `call/apply`可以改变函数运行时的`this`指向
+
+   ```js
+   function method(txt){
+       console.log(this.name + txt);
+   }
+   obj = {
+       name: 'chayatish',
+   }
+   method.call(obj, ' is saying.');  // chayatish
+   method.apply(obj, [' is saying']); // chayatish
+   ```
+
+4. `obj.func()；` `func()`里的`this`指向`obj`
+
+   ```js
+   obj = {
+       name: 'tishacy',
+       method: function () {
+           console.log(this.name);
+       }
+   }
+   obj.method();
+   // tishacy
+   ```
+
+**经典例题**
+
+```js
+var name = "222";
+var a = {
+    name: "111",
+    say: function () {
+        console.log(this.name);
+    }
+}
+var fun = a.say;
+fun();			 // '222'
+a.say();		 // '111'
+
+var b = {
+    name: "333",
+    say: function (fun) {
+        fun();	// 空执行，走预编译
+    }
+}
+b.say(a.say);	// '222'
+b.say = a.say; 
+b.say();		// '333'
+```
+
+
+
+```js
+var foo = 123;
+function print() {
+    this.foo = 234;
+    console.log(foo);
+}
+print();
+// 234
+```
+
+`function print(){}`走预编译，`this`指向`window`，因此`window.foo=234`，覆盖了之前的`foo=123;`，因此会打印出`234`。
+
+```js
+var foo = 123;
+function print() {
+    this.foo = 234;
+    console.log(foo);
+}
+new print();
+// 123
+```
+
+`new print()`生成对象时，`this`指向为所创建的对象本身，所以该对象的含有属性`foo`，但是`console.log(foo)`是输出的全局的`foo`，因此打印出`123`。
+
+若想打印出自身的`foo`，应当改为`console.log(this.foo)`。
+
+
+
+## `arguments.callee`和`func.caller`
+
+### `arguments.callee`
+
+`arguments.callee`指向传参列表的引用，即使用该参数列表的函数体。
+
+```js
+function test(){
+    console.log(arguments.callee);
+}
+test();
+// function test() {...}
+```
+
+#### 通常的使用方法
+
+在无名函数内部如果想要使用该函数的引用时，需要用到`arguments.callee`，比如递归时：
+
+```js
+// 求100的阶乘
+var num = (function (n){
+    if (n == 1){
+        return 1;
+    }
+    return n * arguments.callee(n - 1);
+}(100));
+```
+
+### `func.caller`
+
+`func.caller`指向最终调用函数`func`的函数体。比如：
+
+```js
+function test() {
+    demo();
+}
+function demo() {
+    task();
+}
+function task() {
+    console.log(task.caller);
+}
+test();
+// function test() {...}
+```
+
+
+
+## 克隆（拷贝）
+
+### 浅拷贝
+
+```js
+var obj = {
+    name: 'abc',
+    age: 123,
+    sex: 'female',
+    card: ['visa', 'unionpay']
+}
+var obj1 = {}
+
+function clone(origin, target) {
+    // 将origin的属性全部克隆给target
+    var target = target || {};
+    for (var prop in origin) {
+        target[prop] = origin[prop];
+    }
+    return target;
+}
+
+clone(obj, obj1);
+```
+
+浅拷贝之后，修改`target`属性，如果属性是原始值，那么`origin`的属性没有变化，但是如果属性是引用值，那么修改`target`之后`origin`相应的引用值也会发生变化。比如：
+
+```js
+// 接上段代码
+obj1['card'].push('master');
+console.log(obj1['card']);	// ['visa', 'unionpay', 'master']
+console.log(obj['card']);	// ['visa', 'unionpay', 'master']
+```
+
+### 深拷贝
+
+```js
+var obj = {
+    name: 'abc',
+    age: null,
+    card: [1,2,3,4,5],
+    wife: {
+        name: 'xiaoliu',
+        son: {
+            name: "aaa",
+        }
+    }
+}
+
+var obj1 = {}
+
+function deepClone(origin, target){
+    var target = target || {},
+        toStr = Object.prototype.toString,
+        arrStr = '[object Array]',
+        objStr = '[object Object]';
+
+    for (var prop in origin) {
+        // 判断是否为origin的自有属性,避免使用原型链中的属性
+        if (origin.hasOwnProperty(prop)){   
+            if (toStr.call(origin[prop]) == arrStr) {
+                // 如果属性是数组
+                target[prop] = [];
+                deepClone(origin[prop], target[prop]);
+            }else if (toStr.call(origin[prop]) == objStr){
+                // 如果属性是对象
+                target[prop] = {};
+                deepClone(origin[prop], target[prop]);
+            }else {
+                // 如果属性是原始值
+                target[prop] = origin[prop];
+            }
+        }
+    }
+    return target;
+}
+
+deepClone(obj, obj1);
+console.log(obj);		// {name: "abc"...}
+console.log(obj1);		// {name: "abc"...}
+```
+
+检测是否是深度拷贝，即改变一对象的属性会不会改变另一个对象的属性：
+
+```js
+obj1['wife']['name'] = "xiaozhang";
+console.log(obj['wife']['name']);	// xiaoliu
+console.log(obj1['wife']['name']);	// xiaozhang
+```
+
+
+
+
+
+
+
+
 
 
 
@@ -2359,7 +2604,7 @@ for (var prop in obj) {
    'null'   // ×
    ```
 
-   `typeof`的6中传出值：`'string'` `'number'` `'boolean'` `'function'` `'object'` `'undefined'`
+   `typeof`的6种传出值：`'string'` `'number'` `'boolean'` `'function'` `'object'` `'undefined'`
 
 4. 看看下面`alert`的结果是什么
 
@@ -2403,5 +2648,18 @@ for (var prop in obj) {
        return count;
    }
    ```
+
+6. 下面的代码输出的是：
+
+   ```js
+   var f = (
+   	function f(){return "1"},
+   	function g(){return 2}
+   )();
+   console.log(typeof f);
+   // "number"
+   ```
+
+   解析：JS中逗号操作符`,`有一个功能，当多个值用逗号操作符连接时，会返回最后一个值，比如`(1,2,3,4,5)`会返回`5`。因此，上述代码中第1行至第4行相当于`var f = (function g(){return 2})();` 即使函数`g`立即执行吼赋值给变量`f`，此时`f=2`，故`typeof f`为`"number"`。 
 
    
