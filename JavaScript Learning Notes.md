@@ -2612,9 +2612,230 @@ function deepClone(origin, target) {
   // [undefined × 5, 5]
   ```
 
+## 数组的常用方法
+
+> ES3.0的数组方法
+
+### 改变原数组
+
+- `arr.push(num or nums)`：从数组尾部添加数据，可添加多个数据
+
+  ```js
+  var arr = [];
+  arr.push(1);		// 返回数组长度 1
+  console.log(arr);	// [1]
   
+  arr.push(2,3,4,5);	// 返回数组长度 5
+  console.log(arr);	// [1,2,3,4,5]
+  ```
+
+- `arr.pop()`：从数组尾部移除1个数据
+
+  ```js
+  var arr = [1,2,3];
+  arr.pop();			// 返回移除的值 3
+  console.log(arr);	// [1,2]
+  ```
+
+- `arr.shift()`：从数组顶部移除1个数据
+
+  ```js
+  var arr = [1,2,3];
+  arr.shift();		// 返回移除的值 1
+  console.log(arr);	// [2,3]
+  ```
+
+- `arr.unshift(num or nums)`：从数组顶部添加数据，可添加多个数据
+
+  ```js
+  var arr = [1,2,3];
+  arr.unshift(-1, 0);	// 返回数组长度 5
+  console.log(arr);	// [-1,0,1,2,3]
+  ```
+
+- `arr.reverse()`：将数组翻转
+
+  ```js
+  var arr = [1,2,3];
+  arr.reverse();		// 返回翻转后的数组 [3,2,1]
+  console.log(arr);	// [3,2,1]
+  ```
+
+- `arr.splice(from, len, nums)`：将数组从`from`位置切除长度为`len`的数据，并在原数组的切口处插入（多个）数据`nums`
+
+  ```js
+  var arr = [1,2,3,4,5];
+  arr.splice(1, 2, 9, 8);	// 返回切片出来的数据 [2,3]
+  console.log(arr);		// [1,9,8,4,5]
+  ```
+
+  实例：给数组添加某一位数据，如给数组`[1,2,3,5]`使用`splice`方法得到`[1,2,3,4,5]`：
+
+  ```js
+  var arr = [1,2,3,5];
+  arr.splice(3, 0, 4);	// 返回切片出来的数据 []
+  console.log(arr);		// [1,2,3,4,5]
+  ```
+
+  **注意**：`splice()`中的`from`可以是负数，表示倒数第几位。如：
+
+  ```js
+  var arr = [1,2,3,4];
+  splice(-1, 1);			// 返回 4
+  cosnole.log(arr);		// [1,2,3]
+  ```
+
+- `arr.sort()`：
+
+  - 无参数时，将数组按Unicode位点排序：
+
+      ```js
+      var arr = [1,3,5,4,0];
+      arr.sort();				// 返回升序排列的数组 [0,1,3,4,5]
+      console.log(arr);		// [0,1,3,4,5]
+      
+      arr = [1,3,5,4,10];
+      arr.sort();
+      console.log(arr);		// [1,10,3,4,5]
+      ```
+
+  - 含参数时，将一个匿名函数`function `作为参数传进去，可以实现任意方式的排序。该匿名函数的要求如下：
+
+    - `function `必须写两个形参`a, b`，
+      - 其中`a`是比较算法中的主键（key ），`b`是与`a`相比较的值。
+    - 看返回值
+      - 当返回值为负数时，将主键`a`放前面（或记为交换`a`, `b`次序）
+      - 当返回值为正数时，将主键`a`放后面（记为不交换`a`, `b`次序）
+      - 当返回值为0时，不动
+
+    ```js
+    var arr = [20,2,10,13,4,8,9];
+    
+    // 升序排列
+    arr.sort(function (a, b){
+        return (a-b);
+    })
+    console.log(arr);	// [1,3,4,5,10]
+    
+    // 降序排列
+    arr.sort(function (a, b){
+        return (b-a);
+    })
+    console.log(arr);	// [10,5,4,3,1]
+    ```
+
+    **深入理解**：chrome对sort做了特殊处理，对于长度小于23的数组使用插入排序（insert sort），大于23使用快排（quick sort）。快排是不稳定的排序算法，因此Mozilla和safari采用的是归并排序（merge sort）。
+
+    **例题** 
+
+     1. 给一个有序数组，将其乱序
+
+        ```js
+        var arr = [1,2,3,4,5,6,7];
+        arr.sort(function () {
+            return Math.random() - 0.5;
+        })
+        ```
+
+    	2. 给一个对象数组，根据对象的`age`升序排列
+
+        ```js
+        var cheng = {
+                name: 'cheng',
+                age: 18
+            }
+        var deng = {
+                name: 'deng',
+                age: 40
+            }
+        var zhang = {
+                name: 'zhang',
+                age: 20
+            };
+        
+        arr = [cheng, deng, zhang];
+        // 按 age 升序排列
+        arr.sort(function (a, b) {
+            return a['age'] - b['age']
+        });
+        for (var i in arr) {
+            console.log(arr[i]['name'] + ": " + arr[i]['age']);
+        }
+        // cheng: 18
+        // zhang: 20
+        // deng: 40
+        ```
+
+    	3. 按字符串长度排序（从小到大）
+
+        ```js
+        var arr = ['ac', 'fdfdfdfdafdafadfasdfadf', 'bcd', 'cccc', 'dddd', 'asdfsdfdaf'];
+        arr.sort(function (a, b) {
+            return a.length - b.length;
+        });
+        console.log(arr);
+        // ["ac", "bcd", "cccc", "dddd", "asdfsdfdaf", "fdfdfdfdafdafadfasdfadf"]
+        ```
+
+### 不改变原数组
+
+- `arr.concat(arr1)`：在`arr`后面拼接`arr1`，并返回拼接后的新数组，新数组独立于拼接的两个数组。
+
+  ```js
+  var arr = [1,2,3],
+      arr1 = [4,5,6];
+  var arr2 = arr.concat(arr1);
+  console.log(arr2);		// [1,2,3,4,5,6]
+  console.log(arr);		// [1,2,3]
+  console.log(arr1);		// [4,5,6]
+  ```
+
+- `arr.slice(from=0, to=arr.length)`：
+
+  - 不含参数时，`arr.slice()`表示截取整个数组并返回一个新数组
+  - 含1个参数时，`arr.slice(from)`表示从第`from`位元素截取至数组的最后
+  - 含2个参数时，`arr.slice(from, to)`表示从`from`位元素截取值`to`位元素，不包含第`to`位元素。
+
+  `from`和`to`都可以是负数，代表倒数第几位。
+
+  > `arr.slice(from, to)`有点类似python中的数组切片，`arr[from: to]`
+
+- `arr.toString()`：将`arr`中的每个元素使用`toString()`方法转化为字符串，然后用`,`连接起来。
+
+  ```js
+  [1,2,3,4,[4,[5,{a:[546, 8]}]]].toString()
+  // "1,2,3,4,4,5,[object Object]"
+  ```
+
+- `arr.join(str=",")`：用`str`将数组中的元素连接起来，其中数组中的元素使用`toString()`方法转化为字符串。
+
+  ```js
+  var arr = [1,2,3,4,5];
+  var joinedArray = arr.join("-");
+  console.log(joinedArray);
+  // "1-2-3-4-5"
+  ```
+
+  ```js
+  var arr = [{}, {name:'tish'}];
+  var joinedArray = arr.join("-");
+  console.log(joinedArray);
+  // "[object Object]-[object Object]"
+  ```
+
+- `string.split(str)`：将`string`按照`str`拆分成数组。
+
+  ```js
+  var string =  "1-2-3-4-5-6";
+  var arr = string.split("-");
+  var arr1 = string.split("");
+  console.log(arr);		// ["1", "2", "3", "4", "5", "6"]
+  console.log(arr1);		// ["1", "-", "2", "-", "3", "-", "4", "-", "5", "-", "6"]
+  ```
 
   
+
+
 
 
 
