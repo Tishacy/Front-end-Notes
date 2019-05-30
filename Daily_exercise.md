@@ -132,3 +132,36 @@
 
    
 
+5. 以下代码的输出是什么，解释你的答案。如何在这里使用闭包？
+
+   ```js
+   for (var i=0; i<5; i++) {
+       setTimeout(function() {
+           console.log(j);
+       }, j * 1000);
+   }
+   ```
+
+   知识点：
+
+   - `setTimeout(func, delay)`：延时`delay`毫秒后执行`func`
+   - 闭包
+
+   解析：
+
+   - 代码输出为：每隔1000毫秒，就打印一个5
+
+   - 使用立即执行函数来解决闭包问题，实现每隔1000毫秒，就依次打印0,1,2,3,4。
+
+     ```js
+     for (var i=0; i<5; i++) {
+         (function (j){
+             setTimeout(function() {
+                 console.log(j);
+             }, j * 1000);
+         }(i));
+     }
+     ```
+
+     
+
