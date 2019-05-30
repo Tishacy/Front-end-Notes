@@ -3102,3 +3102,51 @@ console.log(obj);
    // [1, 0, "a", "b"]
    ```
 
+3. 下列代码执行得到什么
+
+   ```js
+   var res = (function(x){
+       delete x;
+       return x;
+   }(1));
+   console.log(x);
+   // 1
+   ```
+
+   - 任何使用 `var` 声明的属性不能从全局作用域或函数的作用域中删除。
+   - 形参在预编译的时候相当于`var`声明。
+
+   因此，没有删除该变量，输出`1`。
+
+4. 下列代码执行得到什么
+
+   ```js
+   var res = (function () {
+       return typeof(arguments);
+   }());
+   console.log(res);
+   // "object"
+   ```
+
+   `arguments`是类数组，因此类型是`object`。
+
+   > 即使是真数组，那`typeof(数组)`也是返回`“object”`。
+
+5. 给一个字符串，返回出第一个只出现一次的字符。
+
+   ```js
+   function charFirst(str) {
+       var targetIndex = str.length,
+           len = str.length;
+       for (var i=0; i<len; i++) {
+           var times = len - str.split(str[i]).join("").length;
+           if (times == 1 && i < targetIndex) {
+               targetIndex = i;
+           }
+       }
+       return str[targetIndex];
+   }
+   ```
+
+   
+
