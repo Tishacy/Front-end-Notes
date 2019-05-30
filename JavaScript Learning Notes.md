@@ -2894,9 +2894,38 @@ console.log(obj);
 
 
 
+# `try catch`
+
+`try`中的代码中如果出现错误，则`try`中的代码结束运行，跳转到`catch`中继续运行，`catch(err)`会捕获错误对象`err`，`err`含有两个属性：错误名称`err.name`和错误信息`err.message`。
+
+```js
+try {
+    console.log('a');
+    console.log(b);
+    console.log('c');
+}catch(e){
+    console.log(e.name + ": " + e.message);
+}
+console.log('d');
+// 'a'
+// ReferenceError: b is not defined.
+// 'd'
+```
+
+## 错误类型
+
+| 错误名称         | 错误信息                   |
+| ---------------- | -------------------------- |
+| `EvalError`      | `eval()`的使用与定义不一致 |
+| `RangeError`     | 数值越界                   |
+| `ReferenceError` | 非法或不能识别的引用数值   |
+| `SyntaxError`    | 发生语法解析错误           |
+| `TypeError`      | 操作数类型错误             |
+| `URIError`       | URI处理函数使用不当        |
 
 
 
+# 
 
 
 
@@ -3149,4 +3178,3 @@ console.log(obj);
    ```
 
    
-
