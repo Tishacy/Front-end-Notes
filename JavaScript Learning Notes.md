@@ -2599,6 +2599,8 @@ function deepClone(origin, target) {
   console.log(arr);	// [undefined × 5];
   ```
 
+
+
 ## 数组的读写
 
 - **读**：`arr[num]` 溢出读时，结果是`undefined`
@@ -2611,6 +2613,8 @@ function deepClone(origin, target) {
   console.log(arr);
   // [undefined × 5, 5]
   ```
+
+
 
 ## 数组的常用方法
 
@@ -2833,7 +2837,60 @@ function deepClone(origin, target) {
   console.log(arr1);		// ["1", "-", "2", "-", "3", "-", "4", "-", "5", "-", "6"]
   ```
 
-  
+
+
+## 类数组
+
+类数组（array like object）是具有和数组类似属性和方法的对象。
+
+构建一个类数组需要满足：
+
+1. 属性要有索引（数字）属性
+2. 必须有`length`属性
+3. 最好加上`push`方法
+4. 加上`splice`方法后，`console.log(类数组)`得到的形式和数组类似
+
+```js
+var obj = {
+    "0": "a",
+    "1": "b",
+    "2": "c",
+    "length": 3,
+    "push": Array.prototype.push,
+    "splice": Array.prototype.splice
+}
+console.log(obj);
+// ["a", "b", "c", push: ƒ, splice: ƒ]
+```
+
+在使用`obj.push(a)`的时候，调用`Array.prototype.push`的用法，即使用`this[this.length]= a`， 然后`this.length++`。比如：
+
+```js
+// obj接上块代码
+obj.push("d");
+// 相当于
+// obj[obj.length] = obj["3"] = "d"
+// obj.length++；
+console.log(obj);
+// ["a", "b", "c", "d", push: ƒ, splice: ƒ]
+```
+
+**阿里的题**
+
+```js
+var obj = {
+    "2": "a",
+    "3": "b",
+    "length": 4,
+    "push": Array.prototype.push,
+}
+obj.push("c");
+obj.push("d");
+console.log(obj);
+// {2: "c", 3: "d", length: 4, push: ƒ}
+```
+
+解析：`obj.push("c")`相当于`obj[obj.length] = "c"`，相当于`obj["2"]="c"`，然后`obj.length++`。然后`obj.push("d")`相当于`obj[obj.length] = "d"`，相当于`obj["3"]="d"`，然后`obj.length++`。得到`obj = {2: "c", 3: "d", length: 4, push: ƒ}`。
 
 
 
@@ -2960,4 +3017,88 @@ function deepClone(origin, target) {
    解析：JS中逗号操作符`,`有一个功能，当多个值用逗号操作符连接时，会返回最后一个值，比如`(1,2,3,4,5)`会返回`5`。因此，上述代码中第1行至第4行相当于`var f = (function g(){return 2})();` 即使函数`g`立即执行吼赋值给变量`f`，此时`f=2`，故`typeof f`为`"number"`。 
 
    
+
+## 作业题
+
+1. 封装`type`函数，可以实现对所有类型的变量的类型判断（比`typeof()`更严格）
+
+    ```js
+    // 封装type
+    function type(target) {
+        var toStr = Object.prototype.toString;
+        var templ = {
+            // 包装类
+            '[object Number]': "[object Number]",
+            '[object String]': "[object String]",
+            '[object Boolean]': "[object Boolean]",
+            // 数组
+            '[object Array]': "array",
+            // null
+            '[object Null]': "null",
+            // 对象
+            '[object Object]': "object"
+        }
+    
+        // tyoeof item == object
+        if (typeof(target) === "object") {
+            return templ[toStr.call(target)];
+        }else{
+            return typeof(target)
+        }
+    }
+    ```
+
+    测试一下：
+
+    ```js
+    var test = (function (){
+        var testCase = [1, new Number(1),
+                        "1", new String("1"),
+                        true, new Boolean(true),
+                        [1,2,3], null, {name:"asdf"},
+                        function (){}, undefined];
+        for (var i in testCase){
+            console.log(type(testCase[i]));
+        }
+    })();
+    // number
+    // [object Number]
+    // string
+    // [object String]
+    // boolean
+    // [object Boolean]
+    // array
+    // null
+    // object
+    // function
+    // undefined
+    ```
+
+2. 给数组去重，要求在原型链上编程。
+
+   ```js
+   // 数组去重
+   // 要求在原型链上编程
+   Array.prototype.unique = function () {
+       var hash = {};
+       var result = [];
+       for(var i=0; i<this.length; i++){
+           if(!hash[this[i]]){
+               hash[this[i]] = true;
+               result.push(this[i]);
+           }
+       }
+       return result;
+   }
+   ```
+
+   测试一下：
+
+   ```js
+   var test = (function (){
+       var arr = [1,1,1,1,0,0,0,0,0,"a","a","b"];
+       console.log(arr.unique());
+   }());
+   // [1, 0, "a", "b"]
+   ```
 
