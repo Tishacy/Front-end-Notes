@@ -2925,7 +2925,187 @@ console.log('d');
 
 
 
-# 
+# ES5标准模式
+
+现在的浏览器执行JS代码是**基于ES3.0的**和**ES5.0的新增方法**。
+
+- 当ES3.0和ES5.0出现冲突时，使用ES3.0的方法
+- 如果采用ES5.0严格模式，那么冲突时则使用ES5.0的方法
+- ES即ECMAScript，3.0和5.0是不同的版本
+
+## ES5.0严格模式
+
+### ES5.0严格模式的启用
+
+- **全局严格模式**：在`<script>`标签或者js文件的逻辑顶端用字符串类型写：`"use strict";`
+
+- **局部严格模式（推荐）**：在函数内部的第一行写上`"use strict";`，比如：
+
+  ```js
+  function test() {
+      "use strict";
+      console.log(arguments.callee);
+  }
+  test();
+  // Uncaught TypeError: 'caller', 'callee', and 'arguments' properties may not be accessed on strict mode functions or the arguments objects for calls to them at ...
+  ```
+
+### ES3.0和ES5.0的冲突
+
+- ES5.0**不允许使用`arguments.callee`和`func.caller`**
+
+- ES5.0**不允许使用`with(){}`语法**
+
+  `with(obj)`可以传入对象`obj`。`with`可以改变作用域链，会将`obj`放到`with`代码块的作用域的最顶端，代码块中访问的变量第一时间从`obj`中找。比如：
+
+  ```js
+  var obj = {
+      name: "obj",
+  }
+  var name = "window";
+  function test() {
+      var name = "scope";
+      var age = 123;
+      with (obj){				// 将obj放入该代码块的作用域最顶端
+          console.log(name);	// 从obj中找到name
+          console.log(age);	// obj中找不到age,然后沿着作用域链找到function test作用域中的age
+      }
+  }
+  test();
+  // "obj"
+  // 123
+  ```
+
+  **应用**：配合命名空间使用
+
+  ```js
+  // 定义命名空间
+  var org = {
+      department1: {
+          tishacy: {
+              name: "tish",
+              method1: function() {},
+              method2: function() {}
+          },
+          chayatish: {
+              name: "chay",
+   			method1: function() {},
+              method2: function() {}
+          }
+      },
+      department2: {
+          xiaodeng: {
+              // ...
+          }
+      }
+  }
+  
+  // 使用tishacy的命名空间进行编程
+  with (org.department1.tishacy) {
+      console.log(name);  // tish
+      method1();
+      method2();
+  }
+  // 使用chayatish的命名空间进行编程
+  with (org.department1.chayatish) {
+      console.log(name);	// chay
+      method1();
+      method2();
+  }
+  ```
+
+  - **`with`的缺点（面试常问）：修改作用域链，造成计算量增加，拖慢程序进行。因此，ES5.0严格模式下不允许使用`with`。**
+
+- ES5.0严格模式下，**变量赋值前必须进行声明**。
+
+  ```js
+  "use strict";
+  var a = b = 3;
+  // Uncaught ReferenceError: b is not defined
+  ```
+
+- ES5.0严格模式下，**局部的`this`必须被赋值**，赋什么就是什么，不赋值就是`undefined`。
+
+  比如，ES3.0函数预编译时，函数体内的`this`指向`window`，但是ES5.0严格模式下函数预编译时，函数体内的`this`为`undefined`。
+
+  ```js
+  // ES5.0严格模式
+  "use strict";
+  function test(){
+      console.log(this);
+  }
+  test();			// undefined
+  test.call({});	// {}
+  test.call(123);	// 123
+  ```
+
+  ```js
+  // 标准模式
+  function test() {
+      console.log(this);
+  }
+  test();			// Window {...}
+  test.call({});	// {}
+  test.call();	// Number {123}
+  ```
+
+- ES5.0严格模式下**不允许使用重复参数和属性**
+
+  - 不允许使用重复参数，否则会报错
+
+      ```js
+      // ES5.0严格模式
+      "use strict";
+      (function test(name, name) {
+          console.log(name);
+      }("1", "2"));
+      // Uncaught SyntaxError: Duplicate parameter name not allowed in this context
+      ```
+
+      ```js
+      // 标准模式
+      (function test(name, name) {
+          console.log(name);
+      }("1", "2"));  // 在预编译的时候，统一实参和形参的时候覆盖了参数值
+      // "2"
+      ```
+
+  - 不允许使用重复属性，但是由于语法定义和语法实现的误差，这样不会报错，但是不代表未来不会报错。
+
+    ```js
+    // ES5.0严格模式
+    "use strict";
+    var obj = {
+        name: "123",
+        name: "234"
+    }
+    console.log(obj);
+    // {name: "234"}
+    ```
+
+    ```js
+    // 标准模式
+    var obj = {
+        name: "123",
+        name: "234"
+    }
+    console.log(obj);
+    // {name: "234}
+    ```
+
+总结：
+
+- 不允许使用`arguments.callee`和`func.caller`
+- 不允许使用`with(){}`语句
+- 变量赋值前必须被赋值，否则报错
+- 局部的`this`必须被赋值，否则为`undefined`
+- 不允许使用重复参数和属性
+
+
+
+
+
+
 
 
 
