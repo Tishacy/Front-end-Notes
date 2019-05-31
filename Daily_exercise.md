@@ -163,5 +163,23 @@
      }
      ```
 
-     
+   - 在ES2015上下文中，可以在原始代码中简单地使用`let`而不是`var`
+
+     ```js
+     for (let i=0; i<5; i++) {
+         setTimeout(function(){
+             console.log(i);
+         }, j*1000);
+     }
+     ```
+
+6. 代码返回后会怎么样？
+
+   ```js
+   console.log(typeof typeof 1);
+   ```
+
+   知识点：`typeof`函数返回的结果是字符串形式的。
+
+   解析：首先执行后面的`typeof 1`得到`"number"`，然后执行`typeof "number"`得到`"string"`。
 
