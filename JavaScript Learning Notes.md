@@ -74,7 +74,7 @@
 - DOM
 - BOM
 
-
+> 本笔记主要涉及到ECMAScript部分。
 
 # JavaScript 入门
 
@@ -3100,12 +3100,6 @@ console.log('d');
 - 变量赋值前必须被赋值，否则报错
 - 局部的`this`必须被赋值，否则为`undefined`
 - 不允许使用重复参数和属性
-
-
-
-
-
-
 
 
 
