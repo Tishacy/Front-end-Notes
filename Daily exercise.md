@@ -183,3 +183,14 @@
 
    解析：首先执行后面的`typeof 1`得到`"number"`，然后执行`typeof "number"`得到`"string"`。
 
+7. 代码会返回什么？
+
+   ```js
+   typeof undefined == typeof NULL
+   ```
+
+   知识点：`typeof`用法
+
+   解析：结果返回`true`。`NULL`是未定义的变量（注意不是`null`），未定义的变量使用`typeof`不会报错，而是返回`"undefined"`。`typeof undefined`也会返回`"undefined"`，因此会返回`true`。
+
+   
