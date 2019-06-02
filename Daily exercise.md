@@ -193,4 +193,139 @@
 
    解析：结果返回`true`。`NULL`是未定义的变量（注意不是`null`），未定义的变量使用`typeof`不会报错，而是返回`"undefined"`。`typeof undefined`也会返回`"undefined"`，因此会返回`true`。
 
+8. 以下代码输出什么？为什么？
+
+   ```js
+   var b = 1;
+   function outer() {
+       var b = 2;
+       function inner() {
+           b++;
+           var b = 3;
+           console.log(b);
+       }
+       inner();
+   }
+   outer();
+   ```
+
+   执行结果：
+
+   ```js
+   3
+   ```
+
+   知识点：函数预编译及作用域链
+
+   解析：
+
+   1. 全局预编译，作用域链如下：
+
+      ```js
+      [[scope]] = {
+          GO: {
+              b: undefined,
+              outer: function outer () {/*...*/}
+      	}
+      }
+      ```
+
+   2. 执行第1行，将`GO`中的`b`赋值为1，此时作用域链为：
+
+      ```js
+      [[scope]] = {
+          GO: {
+              b: 1,
+              outer: function outer () {/*...*/}
+      	}
+      }
+      ```
+
+   3. 执行第11行，执行`outer`函数进行该函数的预编译，此时作用域链为：
+
+      ```js
+      [[scope]] = {
+          outer_AO: {
+              b: undefined;
+              inner: function inner() {/*...*/}
+          }
+          GO: {
+              b: 1,
+              outer: function outer () {/*...*/}
+      	}
+      }
+      ```
+
+   4. 执行函数`outer`中的`b=2`，将`outer_AO`中的`b`赋值为2，此时作用域链为：
+
+      ```js
+      [[scope]] = {
+          outer_AO: {
+              b: 2;
+              inner: function inner() {/*...*/}
+          }
+          GO: {
+              b: 1,
+              outer: function outer () {/*...*/}
+      	}
+      }
+      ```
+
+   5. 执行函数`outer`中的`inner()`，执行前进行`inner`函数的预编译，此时作用域链为：
+
+      ```js
+      [[scope]] = {
+          inner_AO: {
+              b: undefined
+          }
+          outer_AO: {
+              b: 2;
+              inner: function inner() {/*...*/}
+          }
+          GO: {
+              b: 1,
+              outer: function outer () {/*...*/}
+      	}
+      }
+      ```
+
+   6. 执行函数`inner`的`b++`，就是将`inner_AO`中的`b = b + 1 = undefined + 1 = NaN`。此时作用域链为：
+
+      ```js
+      [[scope]] = {
+          inner_AO: {
+              b: NaN
+          }
+          outer_AO: {
+              b: 2;
+              inner: function inner() {/*...*/}
+          }
+          GO: {
+              b: 1,
+              outer: function outer () {/*...*/}
+      	}
+      }
+      ```
+
+   7. 执行函数`inner`的`b=3`，将`inner_AO`中的`b`赋值为3，此时作用域链为：
+
+      ```js
+      [[scope]] = {
+          inner_AO: {
+              b: 3
+          }
+          outer_AO: {
+              b: 2;
+              inner: function inner() {/*...*/}
+          }
+          GO: {
+              b: 1,
+              outer: function outer () {/*...*/}
+      	}
+      }
+      ```
+
+   8. 执行函数`inner`中的`console.log(b)`，从作用域链顶端依次往下找，直到找到`b`变量，因此从`inner_AO`中找到`b=3`，输出3。
+
    
+
