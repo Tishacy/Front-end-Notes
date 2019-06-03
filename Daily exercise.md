@@ -329,3 +329,47 @@
 
    
 
+9. 使用`typeof bar===='object'`来确定bar是否是一个对象时有什么潜在的缺陷？这个陷阱如何避免？
+
+   - `null`、`Array`以及包装类`Number()` `String()` `Boolean()`使用`typeof`都会返回`'object'`。
+
+   - 使用`Object.prototype.toString.call()`即可实现判断：
+
+     `var toStr = Object.prototype.toString;`
+
+     - ```js
+       var bar = null;
+       console.log(toStr.call(bar) === '[object Null]');
+       // true
+       ```
+
+     - ```js
+       var bar = [];
+       console.log(toStr.call(bar) === '[object Array]');
+       // true
+       ```
+
+     - ```js
+       var bar = new Number(3);
+       console.log(toStr.call(bar) === '[object Number]');
+       // true
+       ```
+
+     - ```js
+       var bar = new String('abc');
+       console.log(toStr.call(bar) === '[object String]');
+       // true
+       ```
+
+     - ```js
+       var bar = new Boolean(true);
+       console.log(toStr.call(bar) === '[object Boolean]');
+       // true
+       ```
+
+   - 使用`bar.constructor`也可以判断：
+     - `[].constructor === Array`
+     - `new Number(3).constructor === Number`
+     - `new String('abc').constructor === String`
+     - `new Boolean(true).constructor === Boolean`
+
