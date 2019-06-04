@@ -373,3 +373,44 @@
      - `new String('abc').constructor === String`
      - `new Boolean(true).constructor === Boolean`
 
+10. 以下代码将输出什么和为什么？如何让两个输出一样？
+
+    ```js
+    var hero = {
+        _name: "John Doe",
+        getSecretIdentity: function () {
+            return this._name;
+        }
+    }
+    var stoleSecretIdentity = hero.getSecretIdentity;
+    console.log(stoleSecretIdentity());
+    console.log(hero.getSecretIdentity());
+    ```
+
+    执行结果：
+
+    ```js
+    undefined
+    'John Doe'
+    ```
+
+    知识点：`this` , `call`和`apply`
+
+    解析：
+
+    - 第8行，`stoleSecretIdentity()`在全局执行，进行函数预编译，这时`this`指向`window`对象，由于`window._name`未定义，所以返回`undefined`。
+
+    - 第9行，`hero.getSecretIdentity()`执行时，谁使用该方法`this`就指向谁，因此返回`hero._name`，即`'John Doe'`。
+
+    - 如果要在全局执行时返回`hero._name`，可以使用`call`或者`apply`。
+
+      ```js
+      stoleSecretIdentity.call(hero);
+      // 'John Doe'
+      stoleSecretIdentity.apply(hero);
+      // 'John Doe'
+      ```
+
+      
+
+    
