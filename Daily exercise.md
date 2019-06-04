@@ -411,6 +411,12 @@
       // 'John Doe'
       ```
 
+      也可以使用`bind`方法来修复`stoleSecretIdentity`函数：
+
+      ```js
+      var stoleScreteIdentity = hero.getSecretIdentity.bind(hero);
+      ```
+
       
 
     
