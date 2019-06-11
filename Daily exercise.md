@@ -439,3 +439,90 @@
 
     
 
+12. 手写冒泡排序
+
+    ```js
+    var arr = [6,5,4,8,1,2,3,8,1];
+    function bubbleSort(arr) {
+        var len = arr.length;
+        for (var i=0; i<len; i++) {
+            for (var j=i+1; j<len; j++) {
+                if (arr[i] > arr[j]) {
+                    var temp = arr[i];
+                    arr[i] = arr[j];
+                    arr[j] = temp;
+                }
+            }
+        }
+        return arr;
+    }
+    
+    console.log(bubbleSort(arr));
+    // [1, 1, 2, 3, 4, 5, 6, 8, 8]
+    ```
+
+13. 用js去除字符串空格
+
+    ```js
+    var str = "       afdsf   fdsaf f "
+    var newStr = str.split(' ').join('');
+    console.log(newStr);
+    // afdsffdsaff
+    ```
+
+14. 实现斐波那契数列
+
+    请实现一个fibonacci函数，要求其参数和返回值如下所示：
+
+    ```js
+    /*
+    	fibonacci数列为 [1,1,2,3,5,8,13,21,34 ...]
+    	则getNthFibonacci(0) 返回1
+    	则getNthFibonacci(4) 返回5
+    */
+    ```
+
+    实现：
+
+    ```js
+    /* 方法1：数列迭代 */
+    function getNthFibonacci(n) {
+        // check
+        if (n<0) {
+            console.log('n cannot be negative.')
+        }
+        if (n<2) {
+            return 1
+        }
+        var a = 1,
+            b = 1;
+        var c;
+        for (var i=0; i<n-1; i++) {
+            c = a + b;
+            a = b;
+            b = c;
+        }
+        return c;
+    }
+    
+    console.log(getNthFibonacci(0))
+    ```
+
+    ```js
+    /* 方法2：递归 */
+    function getNthFibonacci(n) {
+        // check
+        if (n<0) {
+            console.log('n cannot be negative.')
+        }
+        if (n<2) {
+            return 1;
+        }else{
+            return getNthFibonacci(n-1) + getNthFibonacci(n-2);
+        }
+    }
+    console.log(getNthFibonacci(0))
+    ```
+
+    
+
