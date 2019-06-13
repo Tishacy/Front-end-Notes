@@ -526,3 +526,43 @@
 
     
 
+15. 以下代码输出到控制台中，
+
+    ````js
+    console.log((function f(n){return ((n>1)? n*f(n-1):n)})(10));
+    ````
+
+    执行结果：
+
+    ```js
+    3628800
+    ```
+
+    知识点：递归、立即执行函数
+
+    解析：
+
+    - 上述代码等同于：
+
+      ```js
+      console.log((function f(n){
+          if (n>1) {
+              return n * f(n-1);
+          }else{
+              return n;
+          }
+      })(10));
+      ```
+
+      即使用递归的方式来计算10的阶乘，得到结果为3628800。
+
+    - 在递归中，虽然使用了立即执行函数，但是由于递归栈最顶端的函数还在运行，因此递归中的函数的作用域中仍然保留`function f()`，因此不会报错，会递归运行下去，直至递归栈顶的函数返回了最终的结果，`function f()`才会丢失。
+
+      因此，如果上述代码运行后，再访问函数`f`就会报错：
+
+      ```js
+      console.log(f);
+      // Uncaught ReferenceError: f is not defined at <anonymous>:1:13
+      ```
+
+      
