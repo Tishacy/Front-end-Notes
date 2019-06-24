@@ -7,7 +7,9 @@
    console.log(false === '0');
    ```
 
-   执行结果为：
+   <details><summary><b>答案</b></summary>
+   <p>
+    执行结果为：
 
    ```js
    true
@@ -19,6 +21,8 @@
    解析：
 
    在JavaScript中，有两套相等运算符。三重相等运算符`===`的行为与任何传统的相等运算符相同：如果两侧的表达式具有相同的类型和相同的值，则计算结果为`true`。然而，双等号运算符在比较它们之前试图进行类型转换成`Number()`，将`false`转换为`0`,`‘0’`也转换为`0`，二者相等。因此，通常使用`===`来判断二者是否真的相等，而不是`==`。对于`!==`和`!=`也是如此。
+   </p>
+   </details>
 
    
 
@@ -36,7 +40,8 @@
        console.log(y);
    })();
    ```
-
+   <details><summary><b>答案</b></summary>
+   <p>
    执行结果为：
 
    ```js
@@ -64,7 +69,8 @@
       ![](./Notes Images/exercise 2-3.png)
 
       此时，第8行和第9行分别输出`x`和`y`的值，得到`undefined`和`2`。
-
+   </p>
+   </details>
    
 
 3. 以下代码的输出是什么？解释你的答案。
@@ -77,7 +83,8 @@
    a[c] = 456;
    console.log(a[b]);
    ```
-
+    <details><summary><b>答案</b></summary>
+   <p>
    知识点：对象的属性访问与赋值
 
    解析：
@@ -123,13 +130,16 @@
        };
    }
    ```
+   <details><summary><b>答案</b></summary>
+   <p>
 
    解析：不会返回同样的值，`foo1();`执行返回为对象`{bar: 'hello'}`，而`foo2();`执行返回空值，为`undefined`。
 
    因为如果每一行代码是一个可执行的语句，虽然没有加`;`，但是系统会隐式的添加上`;`，然后解释一行执行一行，第二个函数执行到`return`就停止了。
 
    因此，JavaScript通常约定一行开头的大括号应放在行尾，而不是放在新行的开头，避免出现上述情况。
-
+   </p>
+   </details>
    
 
 5. 以下代码的输出是什么，解释你的答案。如何在这里使用闭包？
@@ -141,7 +151,8 @@
        }, j * 1000);
    }
    ```
-
+   <details><summary><b>答案</b></summary>
+   <p>
    知识点：
 
    - `setTimeout(func, delay)`：延时`delay`毫秒后执行`func`
@@ -172,26 +183,36 @@
          }, j*1000);
      }
      ```
+   </p>
+   </details>
 
 6. 代码返回后会怎么样？
 
    ```js
    console.log(typeof typeof 1);
    ```
+   <details><summary><b>答案</b></summary>
+   <p>
 
    知识点：`typeof`函数返回的结果是字符串形式的。
 
    解析：首先执行后面的`typeof 1`得到`"number"`，然后执行`typeof "number"`得到`"string"`。
+    </p>
+    </details>
 
 7. 代码会返回什么？
 
    ```js
    typeof undefined == typeof NULL
    ```
+   <details><summary><b>答案</b></summary>
+   <p>
 
    知识点：`typeof`用法
 
    解析：结果返回`true`。`NULL`是未定义的变量（注意不是`null`），未定义的变量使用`typeof`不会报错，而是返回`"undefined"`。`typeof undefined`也会返回`"undefined"`，因此会返回`true`。
+   </p>
+   </details>
 
 8. 以下代码输出什么？为什么？
 
@@ -208,6 +229,8 @@
    }
    outer();
    ```
+    <details><summary><b>答案</b></summary>
+    <p>
 
    执行结果：
 
@@ -326,10 +349,13 @@
       ```
 
    8. 执行函数`inner`中的`console.log(b)`，从作用域链顶端依次往下找，直到找到`b`变量，因此从`inner_AO`中找到`b=3`，输出3。
-
+    </p>
+    </details>
    
 
 9. 使用`typeof bar===='object'`来确定bar是否是一个对象时有什么潜在的缺陷？这个陷阱如何避免？
+   <details><summary><b>答案</b></summary>
+   <p>
 
    - `null`、`Array`以及包装类`Number()` `String()` `Boolean()`使用`typeof`都会返回`'object'`。
 
@@ -372,6 +398,8 @@
      - `new Number(3).constructor === Number`
      - `new String('abc').constructor === String`
      - `new Boolean(true).constructor === Boolean`
+   </p>
+   </details>
 
 10. 以下代码将输出什么和为什么？如何让两个输出一样？
 
@@ -386,6 +414,9 @@
     console.log(stoleSecretIdentity());
     console.log(hero.getSecretIdentity());
     ```
+
+    <details><summary><b>答案</b></summary>
+    <p>
 
     执行结果：
 
@@ -416,7 +447,8 @@
       ```js
       var stoleScreteIdentity = hero.getSecretIdentity.bind(hero);
       ```
-
+    </p>
+    </details>
       
 
 11. 下面的代码将输出到控制台什么，为什么？
@@ -430,6 +462,9 @@
     console.log("array 2: length=" + arr2.length + " last=" + arr2.slice(-1));
     ```
 
+    <details><summary><b>答案</b></summary>
+    <p>
+
     执行结果：
 
     ```js
@@ -437,9 +472,13 @@
     "array 1: length=5 last=j,o,n,e,s"
     ```
 
+    </p>
+    </details>
     
 
 12. 手写冒泡排序
+    <details><summary><b>答案</b></summary>
+    <p>
 
     ```js
     var arr = [6,5,4,8,1,2,3,8,1];
@@ -461,7 +500,12 @@
     // [1, 1, 2, 3, 4, 5, 6, 8, 8]
     ```
 
+    </p>
+    </details>
+   
 13. 用js去除字符串空格
+    <details><summary><b>答案</b></summary>
+    <p>
 
     ```js
     var str = "       afdsf   fdsaf f "
@@ -469,6 +513,9 @@
     console.log(newStr);
     // afdsffdsaff
     ```
+
+    </p>
+    </details>
 
 14. 实现斐波那契数列
 
@@ -482,6 +529,9 @@
     */
     ```
 
+    <details><summary><b>答案</b></summary>
+    <p>
+    
     实现：
 
     ```js
@@ -524,6 +574,8 @@
     console.log(getNthFibonacci(0))
     ```
 
+    </p>
+    </details>
     
 
 15. 以下代码输出到控制台中，
@@ -531,6 +583,9 @@
     ````js
     console.log((function f(n){return ((n>1)? n*f(n-1):n)})(10));
     ````
+
+    <details><summary><b>答案</b></summary>
+    <p>
 
     执行结果：
 
@@ -565,4 +620,6 @@
       // Uncaught ReferenceError: f is not defined at <anonymous>:1:13
       ```
 
-      
+    </p>
+    </details>
+
