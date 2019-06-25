@@ -643,3 +643,32 @@
 
 ---
 
+16. 移出数组arr中的所有值与item相等的元素。不要直接修改数组arr，结果返回新的数组。
+
+    <details>
+    <summary><b>答案</b></summary>
+    <p>
+
+    ```js
+    var arr = [1,1,1,2,3,4,5,6,7];
+    var item = 1;
+
+    function removeItemFromArr(arr) {
+        var newArr = [];
+        for (var i=0; i<arr.length; i++) {
+            if (arr[i] != item) {
+                newArr.push(arr[i]);
+            }
+        }
+        return newArr;
+    }
+
+    console.log(removeItemFromArr(arr));
+    console.log(arr);
+    // (6) [2, 3, 4, 5, 6, 7]
+    // (9) [1, 1, 1, 2, 3, 4, 5, 6, 7]
+    ```
+    </p>
+    </details>
+
+---
