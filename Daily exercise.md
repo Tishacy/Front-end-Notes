@@ -103,7 +103,7 @@
    }
    ```
 
-   同理，第5行的`a[c]-->a[c.toString()]-->a["[object Object]"]`，并赋值为``456`，将原`"[object Object]"`属性值覆盖成了`456`。
+   同理，第5行的`a[c]-->a[c.toString()]-->a["[object Object]"]`，并赋值为`456`，将原`"[object Object]"`属性值覆盖成了`456`。
 
    ```js
    a = {
@@ -598,9 +598,9 @@
 
 15. 以下代码输出到控制台中，
 
-    ````js
+    ```js
     console.log((function f(n){return ((n>1)? n*f(n-1):n)})(10));
-    ````
+    ```
 
     <details><summary><b>答案</b></summary>
     <p>
@@ -668,6 +668,72 @@
     // (6) [2, 3, 4, 5, 6, 7]
     // (9) [1, 1, 1, 2, 3, 4, 5, 6, 7]
     ```
+    </p>
+    </details>
+
+---
+
+17. 下面代码的输出是什么？
+
+    ```js
+    var num = 10;
+    var obj = {
+        num: 0,
+        inner: {
+            num: 6,
+            print: function() {
+                console.log(this.num);
+            }
+        }
+    }
+    num = 88;
+    obj.inner.print() // ?
+    var fn = obj.inner.print;
+    fn(); // ?
+    (obj.inner.print)(); // ?
+    (obj.inner.print = obj.inner.print)(); // ?
+    ```
+
+    <details>
+    <summary><b>答案</b></summary>
+    <p>
+
+    执行结果：
+    ```js
+    6
+    88
+    6
+    88
+    ```
+
+    知识点： 
+     1. `this`的指向问题
+     2. 赋值语句执行后返回所赋的值
+
+    解析： 
+
+    ```js
+    obj.inner.print(); // 6
+    ```
+    哪个对象调用的函数，`this`就指向谁。这里是`obj.inner`这个对象调用，因此打印出`obj.inner.num`，即`6`。
+
+    ```js
+    var fn = obj.inner.print;
+    // 此时 fn = function () {console.log(this.num)};
+    fn();
+    ```
+    函数在全局内执行，走函数预编译时，`this`指向的是`window`，因此打印出全局的`num`，即`88`。
+
+    ```js
+    (obj.inner.print)(); // 6
+    ```
+    与第一句相同，只不过是立即执行而已。
+
+    ```js
+    (obj.inner.print = obj.inner.print)(); // 88
+    ```
+    首先，`(obj.inner.print = obj.inner.print)`是一个赋值语句，赋值语句执行后，会返回所赋的值本身，在这里就是函数体`function () {console.log(this.num)}`。因此，这里就是函数体本身在全局内执行，走预编译，`this`指向`window`，因此结果是`88`。
+
     </p>
     </details>
 
