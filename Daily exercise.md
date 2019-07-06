@@ -738,3 +738,26 @@
     </details>
 
 ---
+
+18. 下面关于JavaScript事件的描述错误的是__
+
+    1.  `click`, `mouseenter`, `blur`事件是可以冒泡的
+    2.  `mouseenter` 和 `mouseover` 在高级浏览器下是有区别的
+    3.  事件流分为捕获和冒泡两个阶段
+    4.  在Chrome中，可以使用 `addEventListener` 来给元素添加事件  
+
+    <details>
+    <summary><b>答案</b></summary>
+    <p>
+    答案： 选 1.
+    
+    解析：
+    1. 不是所有的事件都可以冒泡，其中`blur` `focus` `load` `unload`不能冒泡
+    2. 不论鼠标指针穿过被选元素或其子元素，都会触发`mouseover`事件。对应`mouseout`，`mouseenter`只有在鼠标指针穿过被选元素时，才会出发mouseenter事件。
+    3. 事件从根节点开始，逐级派送到子节点，若节点绑定了事件动作，则执行动作，然后继续走，这个阶段叫做“捕获阶段（capture）”；执行捕获阶段之后，事件由子节点往根节点派送，若节点绑定了事件动作，则执行动作，然后继续走，这个阶段成为“冒泡阶段（bubble）”。如下图所示：
+
+        <img src="./Notes Images/events_capture_bubble.png" width="450px">
+
+    4. IE中使用自有的`attachEvent`函数绑定事件，其他浏览器使用`addEventListener`来绑定事件。
+    </p>
+    </details>
