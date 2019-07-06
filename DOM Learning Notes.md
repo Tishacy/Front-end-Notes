@@ -13,6 +13,30 @@
 
 ## 对节点的增删改查
 
+### 节点
+
+#### 节点的四个属性
+
+- `nodeName`：只读
+  - 元素的标签名，以大写字符串形式表示
+  - 其他节点的`nodeName`是`#text #comment`等。
+- `nodeValue`：text节点和comment节点才有这个
+- `nodeType`：该节点的类型，只读
+  - 元素节点 —— 1
+  - 属性节点 —— 2
+  - 文本节点 —— 3
+  - 注释节点 —— 8
+  - document —— 9
+  - DocumentFragment ——11
+- `attributes`： 该节点的属性节点集合（类数组）。
+  - 可以改属性值，不能改属性名
+
+#### 节点的一个方法
+
+`Node.hasChildNodes();`: 某节点是否含有子节点。
+
+
+
 ### 查
 
 - document代表整个文档
@@ -115,10 +139,10 @@
   **注意**
 
   1. 节点树包含所有类型的节点。包括以下节点类型：
-     - 元素节点 —— 1
-     - 属性节点 —— 2
-     - 文本节点 —— 3
-     - 注释节点 —— 8
+     - 元素节点 —— 1，如 `<div></div>`
+     - 属性节点 —— 2  如 `id="123"`
+     - 文本节点 —— 3  `plain text\n` 
+     - 注释节点 —— 8 `<!-- This is comment -->`
      - document —— 9
      - DocumentFragment ——11
 
@@ -262,18 +286,5 @@
 
   
 
-- 节点的四个属性
-  - `nodeName`：只读
-    - 元素的标签名，以大写字符串形式表示
-    - 其他节点的`nodeName`是`#text #comment`等。
-  - `nodeValue`：text节点和comment节点才有这个
-  - `nodeType`：该节点的类型，只读
-    - 元素节点 —— 1
-    - 属性节点 —— 2
-    - 文本节点 —— 3
-    - 注释节点 —— 8
-    - document —— 9
-    - DocumentFragment ——11
-  - `attributes`： 该节点的属性节点集合（类数组）。
-    - 可以改属性值，不能改属性值
+  
 
