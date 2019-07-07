@@ -9,6 +9,22 @@
 
 
 
+# DOM继承树
+
+<img src="./Notes images/dom继承树.png">
+
+**实例：**
+
+```js
+console.log(document.__proto__); // HTMLDocument.prototype
+console.log(document.__proto__.__proto__); // Document.prototype
+console.log(document.__proto__.__proto__.__proto__); // Node.prototype
+console.log(document.__proto__.__proto__.__proto__.__proto__); // EventTarget.prototype
+console.log(document.__proto__.__proto__.__proto__.__proto__.__proto__); // Object.prototype
+```
+
+
+
 # DOM基本操作
 
 ## 对节点的增删改查
@@ -280,16 +296,49 @@
   null
   ```
 
-  
 
-  
+
+#### 注意
+
+<img src="./Notes images/dom继承树.png">
+
+1. `getElementById`方法定义在`Document.prototype`上。即：
+
+   - `Document`节点可以使用该方法，而`Element`节点没有该方法。
+
+     ```js
+     document.getElementById('123'); // √
+     // var div = document.getElementsByTagName('div')[0];
+     div.getElementById('123'); // ×
+     ```
+
+2. `getElementByName`方法定义在了`HTMLDocument.protype上`。即：
+
+   - 非html中的document不能使用该方法（XMLDocument, Element）
+
+3. `getElementByTagName`方法定义在了`Document.prototype`和`Element.prototype`上。
+
+   - `Document`节点和`Element`节点都可以使用该方法。
+
+     ```js
+     var div = document.getElementsByTagName('div')[0];
+     var span = div.getElementsByTagName('span')[0];
+     ```
+
+4. ` HTMLDocument.prototype`定义了一些常用的属性，`body` `head`分别指代HTML文档中的`<body>` `<head>`标签。
+
+5. `Document.prototype`上定义了`documentElement`属性，只带文档的根元素，在HTML文档中，它总是指代`<html>`元素。
+
+6. `getElementsByClassName` `querySelector` `querySelectorAll` 在`Document.prototype`和`Element.prototype`上均有定义。
+
+
 
 # 练习
 
 1. 遍历元素节点树，在原型链上编程
 
    ```js
-   Object.prototype.getChildren = function (){
+   Node.prototype.getChildren = function (){
        var childNodes = this.childNodes,
            len = childNodes.length;
        var children = {
@@ -318,13 +367,10 @@
    
    // 另一种写法
    function getParent(e, n) {
-     if (e == null) {
-       return null;
+     if (e == null | n == 0) {
+       return e;
      }else if (n > 0) {
        return getParent(e.parentElement, n-1);
-     }else if (n > 0) {
-   		return e;
-     }
    }
    ```
 
