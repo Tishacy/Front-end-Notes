@@ -338,7 +338,77 @@ console.log(document.__proto__.__proto__.__proto__.__proto__.__proto__); // Obje
 1. 遍历元素节点树，在原型链上编程
 
    ```js
-   Node.prototype.getChildren = function (){
+   // 遍历节点树
+   Element.prototype.getElementsTree = function () {
+       var children = this.children,
+           len = children.length;
+       for (var i=0; i<len; i++) {
+           console.log(children[i]);
+           if (children[i].hasChildNodes()) {
+               children[i].getElementsTree();
+           }   
+       }
+   }
+   ```
+   
+2. 封装函数，返回元素e的第n层祖先元素节点
+
+   ```js
+   // 使用递归
+   function getParent(e, n) {
+       return (e == null)? null : ((n>0)? getParent(e.parentElement, n-1) : e);
+   };
+   
+   // 递归的另一种写法
+   function getParent(e, n) {
+     if (e == null || n == 0) {
+       return e;
+     }else if (n > 0) {
+       return getParent(e.parentElement, n-1);
+   }
+     
+   // 使用循环
+   function getParent(e, n) {
+   	while (n && e) {
+       e = e.parentElement;
+       n--;
+     }
+     return e;
+   }
+   ```
+
+3. 封装函数，返回元素e的第n个兄弟元素节点，n为正，返回后面的兄弟元素节点，n为负，返回前面的，n为0，返回自身。
+
+   ```js
+   // 使用递归
+   function getSibling(e, n) {
+   	if (n == 0 || e == null) {
+   		return e;
+   	}else	if (n < 0) {
+   		return getSibling(e.previousElementSibling, n+1);
+   	}else if (n > 0) {
+   		return getSibling(e.nextElementSibling, n-1);
+   }
+     
+   // 使用迭代
+   function getSibling(e, n) {
+       while (n && e) {
+           if (n > 0) {
+               e = e.nextElementSibling;
+               n -- ;
+           }else {
+   						e = e.previousElementSibling;
+               n ++;
+           }
+       }
+       return e;
+   }
+   ```
+
+4. 编辑函数，封装`myChildren`功能，解决以前部分浏览器的兼容性问题
+
+   ```js
+   Element.prototype.getChildren = function (){
        var childNodes = this.childNodes,
            len = childNodes.length;
        var children = {
@@ -349,7 +419,7 @@ console.log(document.__proto__.__proto__.__proto__.__proto__.__proto__); // Obje
        for (var i=0; i<len; i++) {
            if (childNodes[i].nodeType == 1) {
                children.push(childNodes[i]);
-           }
+        }
        }
        return children
    }
@@ -357,41 +427,11 @@ console.log(document.__proto__.__proto__.__proto__.__proto__.__proto__); // Obje
    var div = document.getElementsByTagName('div')[0];
    console.log(div.getChildren());
    ```
-
-2. 封装函数，返回元素e的第n层祖先元素节点
-
-   ```js
-   function getParent(e, n) {
-       return (e == null)? null : ((n>0)? getParent(e.parentElement, n-1) : e);
-   };
    
-   // 另一种写法
-   function getParent(e, n) {
-     if (e == null | n == 0) {
-       return e;
-     }else if (n > 0) {
-       return getParent(e.parentElement, n-1);
-   }
-   ```
-
-3. 封装函数，返回元素e的第n个兄弟元素节点，n为正，返回后面的兄弟元素节点，n为负，返回前面的，n为0，返回自身。
+5. 自己封装hasChildren()方法，不可用children属性
 
    ```js
-   function getSibling(e, n) {
-       if (n == 0 | e == null) {
-           return e;
-       }else if (n < 0) {
-           return getSibling(e.previousElementSibling, n+1);
-       }else if (n > 0) {
-           return getSibling(e.nextElementSibling, n-1);
-       }
-   }
-   ```
-
-4. 自己封装hasChildren()方法，不可用children属性
-
-   ```js
-   function hasChildren(e) {
+   Element.prototype.hasChildren = function (e) {
      var childNodes = e.childNodes,
          len = childNodes.length;
    	for (var i=0; i<len; i++) {
