@@ -27,6 +27,8 @@
   - 文本节点 —— 3
   - 注释节点 —— 8
   - document —— 9
+    - document代表整个文档
+    - `html`标签只是document的根标签，而不代表整个文档	
   - DocumentFragment ——11
 - `attributes`： 该节点的属性节点集合（类数组）。
   - 可以改属性值，不能改属性名
@@ -38,12 +40,6 @@
 
 
 ### 查
-
-- document代表整个文档
-
-  - `html`标签只是document的根标签，而不代表整个文档
-
-
 
 #### 使用方法（method）查找
 
@@ -287,4 +283,79 @@
   
 
   
+
+# 练习
+
+1. 遍历元素节点树，在原型链上编程
+
+   ```js
+   Object.prototype.getChildren = function (){
+       var childNodes = this.childNodes,
+           len = childNodes.length;
+       var children = {
+           length: 0,
+           push: Array.prototype.push,
+           splice: Array.prototype.splice
+       }
+       for (var i=0; i<len; i++) {
+           if (childNodes[i].nodeType == 1) {
+               children.push(childNodes[i]);
+           }
+       }
+       return children
+   }
+   
+   var div = document.getElementsByTagName('div')[0];
+   console.log(div.getChildren());
+   ```
+
+2. 封装函数，返回元素e的第n层祖先元素节点
+
+   ```js
+   function getParent(e, n) {
+       return (e == null)? null : ((n>0)? getParent(e.parentElement, n-1) : e);
+   };
+   
+   // 另一种写法
+   function getParent(e, n) {
+     if (e == null) {
+       return null;
+     }else if (n > 0) {
+       return getParent(e.parentElement, n-1);
+     }else if (n > 0) {
+   		return e;
+     }
+   }
+   ```
+
+3. 封装函数，返回元素e的第n个兄弟元素节点，n为正，返回后面的兄弟元素节点，n为负，返回前面的，n为0，返回自身。
+
+   ```js
+   function getSibling(e, n) {
+       if (n == 0 | e == null) {
+           return e;
+       }else if (n < 0) {
+           return getSibling(e.previousElementSibling, n+1);
+       }else if (n > 0) {
+           return getSibling(e.nextElementSibling, n-1);
+       }
+   }
+   ```
+
+4. 自己封装hasChildren()方法，不可用children属性
+
+   ```js
+   function hasChildren(e) {
+     var childNodes = e.childNodes,
+         len = childNodes.length;
+   	for (var i=0; i<len; i++) {
+       if (childNodes[i].nodeType == 1) {
+         return true;
+       }
+     }
+     return false;
+   }
+   ```
+
+   
 
