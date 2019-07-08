@@ -698,3 +698,128 @@ console.log("耗时", lastTime - firstTime, "毫秒");
 >
 > 上述方法都是全局对象 `window` 上的方法，内部函数中的 `this` 指向 `window`
 
+
+
+# 小知识点
+
+## 获取窗口属性
+
+- 查看滚动条的滚动距离
+
+  - `window.pageXOffset` `window.pageYOffset`
+
+    - IE8及IE8以下不兼容
+
+  - `document.body.scrollLeft` `document.body.scrollTop`
+
+    `document.documentElement.scrollLeft` `document.documentElement.scrollTop`
+
+    - 这两个方法的IE兼容性比较混乱，但是二者互斥，即当`document.body.scrollLeft`有值时，`document.documentElement.scrollLeft`不可能有值。因此，在使用过程中，通常将二者相加，来解决IE的兼容性混乱的问题。
+
+  **练习**：封装兼容性方法，求滚动轮滚动距离 `getScrollOffset()`
+
+  ```js
+  function getScrollOffset () {
+    if (window.pageXOffset) {
+      return {
+        x: window.pageXOffset,
+        y: window.pageYOffset
+      }
+    }else {
+      return {
+        x: document.body.scrollLeft + document.documentElement.scrollLeft,
+        y: document.body.scrollTop + document.documentElement.scrollTop
+      }
+    }
+  }
+  ```
+
+- 求可视区窗口（视口）的尺寸
+
+  -  `window.innerWidth` `window.innerHeight`
+    - IE8及IE8以下不兼容
+  - `document.documentElement.clientWidth` `document.documentElement.clientHeight`
+    - 标准模式下，任意浏览器都兼容
+  - `document.body.clientWidth` `document.body.clientHeight`
+    - 适用于怪异模式（或称混杂模式）下的浏览器
+    - 使用`document.compatMode`可以查看是标准模式还是怪异模式
+      - `"CSS1Compat"`—>标准模式
+      - `"BackCompat"`—>怪异模式：使用老版本的模式来执行代码
+
+  **练习**：封装兼容性方法，返回浏览器视口尺寸 `getViewportSize()`
+
+  ```js
+  function getViewportSize() {
+      if (window.innerWidth) {
+          return {
+          width: window.innerWidth,
+          height: window.innerHeight
+          }
+      }else {
+          var compatMode = document.compatMode;
+          if (compatMode == "CSS1Compat") {
+              return {
+              width: document.documentElement.clientWidth,
+              height: document.documentElement.clientHeight
+              }
+          }else {
+              return {
+              width: document.body.clientWidth,
+              height: document.body.clientHeight
+              }
+          }
+      }
+  }
+  ```
+
+
+
+## 获取DOM属性
+
+- `domElem.getBoudingClientRect();`
+
+  - 不常用
+  - 兼容性良好
+  - 该方法返回一个对象，对象里面有`left` `top`  `right` `bottom`等属性。
+    - `left` `top` 代表该元素左上角的 x y 坐标
+    - `right` `bottom` 代表该元素右下角的 x y 坐标
+    - `height` `width` 属性老版本IE并未实现
+    - 返回的结果并不是“实时的”
+
+- `domElem.offsetWidth`, `domElem.offsetHeight`：查看元素的尺寸
+
+  - 获取的是dom的视觉上的尺寸，包含border padding content部分。 
+
+- `domElem.offsetLeft`, `domElem.offsetTop`：查看元素位置
+
+  - 其返回的结果是: 
+    - 如果该dom元素无**有定位的父级元素**，则返回相对文档的相对位置
+    - 反之，返回距离该dom元素最近的**有定位的父级元素**的相对位置。
+
+  - **实例**：
+
+    ```html
+    <div style="width:300px; height:300px; border:1px solid black; position:relative">
+      <div class="innerDiv1" style="width:100px; height:100px; position:absolute; left:100px; top:100px; background-color:red"></div>
+      <div class="innerDiv2" style="width:100px; height:100px; position: absolute; margin-left:100px; margin-top:100px; border:2px solid blue"></div>
+    </div>
+    ```
+
+    <div style="width:300px; height:300px; border:1px solid black; position:relative">
+      <div class="innerDiv1" style="width:100px; height:100px; position:absolute; left:100px; top:100px; background-color:red"></div>
+      <div class="innerDiv2" style="width:100px; height:100px; position: absolute; margin-left:100px; margin-top:100px; border:2px solid blue"></div>
+    </div>
+
+    ```js
+    var innerDiv1 = document.getElementsByClassName('innerDiv1')[0],
+        innerDiv2 = docuemtn.getElementsByClassName('innerDiv2')[0];
+    console.log(innerDiv1.offsetLeft, innerDiv1.offsetTop);
+    // 100 100
+    console.log(innerDiv2.offsetLeft, innerDiv2.offsetTop);
+    // 100 100
+    ```
+
+    
+
+
+
