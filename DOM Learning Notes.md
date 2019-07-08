@@ -663,3 +663,38 @@ console.log("耗时", lastTime - firstTime, "毫秒");
 | [setMilliseconds()](http://www.w3school.com.cn/jsref/jsref_setMilliseconds.asp) | 设置 Date 对象中的毫秒 (0 ~ 999)。    |
 | [setTime()](http://www.w3school.com.cn/jsref/jsref_setTime.asp) | 以毫秒设置 Date 对象。                |
 
+
+
+# 定时器
+
+- `setInterval(function () {}, timeInterval);`：每过 timeInterval 毫秒之后就会执行一次函数体。
+
+  - 该函数返回该定时器的唯一标识数字，比如如果只有一个定时器，那就返回数字1。
+  - 使用`clearInterval(timer)`，可以终止该定时器的运行，参数`timer`是该定时器的唯一标识数字。
+
+  ```js
+  var i = 0;
+  var timer = setInterval(function () {
+    console.log(i++);
+    if (i > 10) {
+      clearInterval(timer);
+    }
+  }, 1000)
+  // 0 1 2 3 4 5 6 7 8 9 10
+  ```
+
+- `setTimeout(function () {}, timeInterval);`：经过 timeInterval 毫秒之后（只）执行一次函数体。
+
+  - 同样该函数也会返回该定时器的唯一标识数字，并且与`setInterval`生成的定时器的标识数字不会重复。
+  - 一般情况下不需要清除`setTimeout`定时器，但是如果需要取消`setTimeout`定时器的运行，可以通过`clearTimeout(timer)`来清除该定时器，同样传入的参数`timer`是该定时器的唯一标识数字。
+
+  ```js
+  var timer = setTimeout(function () {
+    console.log('timeout')
+  }, 5000);
+  ```
+
+> 注意：
+>
+> 上述方法都是全局对象 `window` 上的方法，内部函数中的 `this` 指向 `window`
+
