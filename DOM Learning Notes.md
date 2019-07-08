@@ -55,7 +55,32 @@ console.log(document.__proto__.__proto__.__proto__.__proto__.__proto__); // Obje
 
 
 
-### 查
+#### 元素节点的一些属性
+
+- innerHTML
+- innerText （老版本火狐不兼容）/ textContent （老版本IE不好使）
+
+#### 元素节点的一些方法
+
+- `element.setAttribute();`
+- `element.getAttribute();`
+
+```js
+// 设 div 是标签 <div></div>
+div.setAttribute('class', 'demo');
+console.log(div);
+// <div class="demo"></div>
+
+var divClass = div.getAttribute('class');
+console.log(divClass);
+// "demo"
+```
+
+
+
+
+
+### 查找
 
 #### 使用方法（method）查找
 
@@ -333,7 +358,7 @@ console.log(document.__proto__.__proto__.__proto__.__proto__.__proto__); // Obje
 
 
 
-# 练习
+#### 查找节点的练习
 
 1. 遍历元素节点树，在原型链上编程
 
@@ -444,4 +469,197 @@ console.log(document.__proto__.__proto__.__proto__.__proto__.__proto__); // Obje
    ```
 
    
+
+### 增加
+
+- `document.createElement('tag name');`
+- `document.createTextNode('text');`
+- `document.createComment('comment');`
+- `document.createDocumentFragment();`
+
+
+
+### 插入
+
+- `PARENTNODE.appendChild(child);`：在`PARENTNODE`中从尾部添加一个子节点。
+  
+  ```js
+  var text = document.createTextNode('I AM A TEXT.');
+  var span = document.createElement('span');
+  document.body.appendChild(text);
+  document.body.appendChild(span);
+  ```
+  ```html
+  <body>
+    "I AM A TEXT."
+    <span></span>
+  </body>
+  ```
+
+  **注意**：
+
+  - 对于新创建的节点，`appendChild()`方法就是把新节点插入到父节点中。
+  
+  - 对于已经存在的节点，`appendChild()`方法其实是把要插入的节点**剪切**到了父节点中。
+  
+    ```html
+    <!-- 原html -->
+    <strong></strong>
+    <div></div>
+    ```
+  
+    ```js
+    var strong = document.getElementsByTagName('strong')[0];
+    var div = document.getElementsByTagName('div')[0]；
+    div.appendChild(strong);
+    ```
+  
+    ```html
+    <!-- 操作后的html -->
+    <div>
+      <strong></strong>
+    </div>
+    ```
+  
+- `PARENTNODE.insertBefore(a, b);`：往`PARENTNODE`中，insert `a` before `b`。
+
+  ```html
+  <!-- 原html -->
+  <div>
+    <strong></strong>
+  </div>
+  ```
+
+  ```js
+  var div = document.getElementsByTagName('div')[0];
+  var strong = document.getElementsByTagName('strong')[0];
+  var span = document.createElement('span');
+  div.insertBefore(span, strong);
+  ```
+
+  ```html
+  <!-- 操作后的html -->
+  <div>
+    <span></span>
+    <strong></strong>
+  </div>
+  ```
+
+  
+
+### 删除
+
+- `parent.removeChild(child);`
+- `child.remove();`
+
+
+
+### 替换（改）
+
+> 使用的不多。
+
+- `parent.replaceChild(new, origin);`：在`parent`中，用`new`替换`origin`。
+
+
+
+### 练习
+
+1. 编写一段JavaScript脚本生成下面这段DOM结构。要求：使用标准的DOM方法或属性。
+
+  ```html
+  <div class="example">
+    <p class="slogan">Something</p>
+  </div>
+  ```
+
+  提示：`dom.className`可以读写`class`。
+
+  实现：
+
+  ```js
+  var div = document.createElement('div');
+  var p = document.createElement('p');
+  div.setAttribute('class', 'example');
+  p.setAttribute('class', 'slogan');
+  p.innerText = "Something";
+  div.appendChild(p);
+  document.body.appendChild(div);
+  ```
+
+2. 封装函数`insertAfter();`，功能类似`insertBefore();`，直接在`Element.prototype`上编程。
+
+   ```js
+   Element.prototype.insertAfter = function (target, origin) {
+     if (origin.nextSibling) {
+       return this.insertBefore(target, origin.nextSibling);    
+     }else {
+      	return this.appendChild(target);
+     }
+   }
+   ```
+
+3. 将目标节点内部的节点顺序逆序。
+
+   eg. `<div><a></a><em></em></div>` —> `<div><em></em><a></a></div>` 
+
+   提示：使用`appendChild()`方法的剪切功能。
+   
+   ```js
+   Element.prototype.reverseChildNodes = function () {
+     var childNodes = this.childNodes,
+         len = childNodes.length;
+     for (var i=len-1; i>=0; i--) {
+       this.appendChild(childNodes[i]);
+     }
+}
+   ```
+   
+   
+
+# 日期对象 `Date()`
+
+## 创建Date对象
+
+```js
+var date = new Date();
+var date = new Date(milliseconds);
+var date = new Date(dateString);
+var date = new Date(year, month, day, hours, minutes, seconds, milliseconds);
+```
+
+## Date对象的常见方法
+
+| 方法                                                         | 描述                                        |
+| :----------------------------------------------------------- | :------------------------------------------ |
+| [getDate()](http://www.w3school.com.cn/jsref/jsref_getDate.asp) | 从 Date 对象返回一个月中的某一天 (1 ~ 31)。 |
+| [getDay()](http://www.w3school.com.cn/jsref/jsref_getDay.asp) | 从 Date 对象返回一周中的某一天 (0 ~ 6)。    |
+| [getMonth()](http://www.w3school.com.cn/jsref/jsref_getMonth.asp) | 从 Date 对象返回月份 (0 ~ 11)。             |
+| [getFullYear()](http://www.w3school.com.cn/jsref/jsref_getFullYear.asp) | 从 Date 对象以四位数字返回年份。            |
+| [getYear()](http://www.w3school.com.cn/jsref/jsref_getYear.asp) | 请使用 getFullYear() 方法代替。             |
+| [getHours()](http://www.w3school.com.cn/jsref/jsref_getHours.asp) | 返回 Date 对象的小时 (0 ~ 23)。             |
+| [getMinutes()](http://www.w3school.com.cn/jsref/jsref_getMinutes.asp) | 返回 Date 对象的分钟 (0 ~ 59)。             |
+| [getSeconds()](http://www.w3school.com.cn/jsref/jsref_getSeconds.asp) | 返回 Date 对象的秒数 (0 ~ 59)。             |
+| [getMilliseconds()](http://www.w3school.com.cn/jsref/jsref_getMilliseconds.asp) | 返回 Date 对象的毫秒(0 ~ 999)。             |
+| **[getTime()](http://www.w3school.com.cn/jsref/jsref_getTime.asp)** | **返回 1970 年 1 月 1 日至今的毫秒数。**    |
+
+```js
+// 使用 getTime() 方法求时间差
+var firstTime = new Date().getTime();
+for (var i=0; i<1000000; i++) {}
+var lastTime = new Date().getTime();
+console.log("耗时", lastTime - firstTime, "毫秒");
+// 耗时 4 毫秒
+```
+
+| 方法                                                         | 描述                                  |
+| ------------------------------------------------------------ | ------------------------------------- |
+| [setDate()](http://www.w3school.com.cn/jsref/jsref_setDate.asp) | 设置 Date 对象中月的某一天 (1 ~ 31)。 |
+| [setMonth()](http://www.w3school.com.cn/jsref/jsref_setMonth.asp) | 设置 Date 对象中月份 (0 ~ 11)。       |
+| [setFullYear()](http://www.w3school.com.cn/jsref/jsref_setFullYear.asp) | 设置 Date 对象中的年份（四位数字）。  |
+| [setYear()](http://www.w3school.com.cn/jsref/jsref_setYear.asp) | 请使用 setFullYear() 方法代替。       |
+| [setHours()](http://www.w3school.com.cn/jsref/jsref_setHours.asp) | 设置 Date 对象中的小时 (0 ~ 23)。     |
+| [setMinutes()](http://www.w3school.com.cn/jsref/jsref_setMinutes.asp) | 设置 Date 对象中的分钟 (0 ~ 59)。     |
+| [setSeconds()](http://www.w3school.com.cn/jsref/jsref_setSeconds.asp) | 设置 Date 对象中的秒钟 (0 ~ 59)。     |
+| [setMilliseconds()](http://www.w3school.com.cn/jsref/jsref_setMilliseconds.asp) | 设置 Date 对象中的毫秒 (0 ~ 999)。    |
+| [setTime()](http://www.w3school.com.cn/jsref/jsref_setTime.asp) | 以毫秒设置 Date 对象。                |
 
