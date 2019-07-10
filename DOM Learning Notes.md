@@ -819,7 +819,58 @@ console.log("耗时", lastTime - firstTime, "毫秒");
     // 100 100
     ```
 
+- `dom.offsetParent`：返回最近的有定位的父级，如无，返回body。
+
+  - `body.offsetParent`是`null`。
+  
     
 
+**练习**：求元素相对于文档的坐标 `getElementPosition`
 
+```js
+Element.prototype.getElementPosition() = function () {
+    var left = this.offsetLeft,
+        top = this.offsetTop,
+        elem = this;
+    while (elem.offsetParent) {
+        elem = elem.offsetParent;
+        left += elem.offsetLeft;
+        top += elem.offsetTop;
+    }
+    return {
+        left: left,
+        top: top,
+      }
+  }
+```
+
+  
+
+## 让滚动条滚动
+
+`window`上有三个方法
+
+- `scroll(x, y)`/`scrollTo(x, y)`：让滚动条滚动到坐标`(x, y)`的位置
+- `scrollBy(x_dist, y_dist)`：让滚动条横向滚动`x_dist`，纵向滚动`y_dist`距离
+
+**练习**：利用`scrollBy()`实现快速阅读的功能
+
+```js
+var startNode = document.getElementsByClassName('start')[0];
+var stopNode = document.getElementsByClassName('stop')[0];
+var timer = 0,
+    key = true;
+startNode.onclick = function () {
+    if (key) {
+	    timer = setInterval(function () {
+            scrollBy(0, 1);		
+        }, 100);
+        key = false;
+    }
+}
+stopNode.onclick = function () {
+    clearInterval(timer);
+    key = true;
+}
+```
 
