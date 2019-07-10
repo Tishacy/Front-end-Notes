@@ -62,8 +62,8 @@ console.log(document.__proto__.__proto__.__proto__.__proto__.__proto__); // Obje
 
 #### 元素节点的一些方法
 
-- `element.setAttribute();`
-- `element.getAttribute();`
+- `element.setAttribute(key, value);`
+- `element.getAttribute(key, value);`
 
 ```js
 // 设 div 是标签 <div></div>
@@ -873,4 +873,103 @@ stopNode.onclick = function () {
     key = true;
 }
 ```
+
+
+
+# 脚本化CSS
+
+## 读写元素css属性
+
+-   `dom.style`：表示的是dom元素的**行间样式**，是一个类数组。
+
+-   `dom.style.prop`：dom元素的行间样式中的`prop`属性。
+
+    -   该属性可读可写，没有兼容性问题，写入的值必须是字符串格式
+    -   遇到`-`连接的css样式，使用小驼峰式命名，如：
+        -   `background-color`—>`dom.style.backgroundColor`
+        -   `font-size`—>`dom.style.fontSize`
+    -   复合样式拆开尽量拆开来写，如：
+        -   [建议]：
+            -   `dom.style.borderWidth = “1px”`
+            -   `dom.style.borderStyle = “solid”`
+            -   `dom.style.borderColor = “black”`
+        -   [不建议]：`dom.style.border = “1px solid black”`
+    -   遇到`float`这样的保留字属性，前面应该加`css`，如：
+        -   `dom.style.cssFloat`
+    -   只能读取行间样式，如果`prop`是非行间样式，则`dom.style.prop`为空串`""`
+
+    ```html
+    <div style="height: 100px"></div>
+    <style>
+        div {
+            width: 100px;
+        }
+    </style>
+    <script>
+    	var div = document.getElementsByTagName('div')[0];
+        console.log(div.height);	// "100px"
+        console.log(div.width);		// ""
+    </script>
+    ```
+
+    
+
+## 查询计算样式
+
+-   `window.getComputedStyle(dom, null)`：返回dom**元素最终可视的样式表**，是一个类似数组
+
+    -   IE8及IE8以下不兼容
+    -   该函数的第二个参数是为了获取伪元素的属性的
+        -   如果是`null`，那么就获取dom元素的样式表
+        -   如果是其他值，如`"after"`，那么就会获取dom元素对应伪元素`dom::after`的样式表
+
+-   `window.getComputedStyle(dom, null).prop`：返回dom元素某属性的计算样式
+
+    -   IE8及IE8以下不兼容
+
+    -   该属性是只读的，不可写入
+
+    -   返回的计算样式的值都是绝对值，没有相对单位，比如：
+
+        ```html
+        <div style="height: 100px"></div>
+        <style>
+            div {
+                width: 10em;
+                background-color: "red";
+            }
+        </style>
+        <script>
+        	var div = document.getElementsByTagName('div')[0];
+            console.log(getComputedStyle(div, null).height);	// "100px"
+            console.log(getComputedStyle(div, null).width);		// "160px"
+            console.log(getComputedStyle(div, null).backgroundColor);	// rgb(255, 0, 0)
+        </script>
+        ```
+
+        其中，
+
+        -   `getComputedStyle(div, null).width`是`"160px"`是因为：em是相对单位，1em默认值是16px，因此10em为160px，而由于返回的式计算样式，因此返回的值是计算后的绝对值，即`"160px"`。
+        -   `getComputedStyle(div, null).backgroundColor`是`"rgb(255, 0, 0)"`是因为经过计算后，颜色值使用的是rgb模式。
+
+-   `elem.currentStyle`：IE独有的属性，可用于查询元素的计算样式
+
+    -   只读，不可写入
+    -   返回的计算样式的值**不是**经过转换的绝对值，因此css中赋的什么值，不管是否是相对单位，都会返回赋的值
+
+
+
+**练习**：封装兼容性方法 `getStyle(elem, prop)`
+
+```js
+function getStyle(elem, prop) {
+    if (window.getComputedStyle(elem, null)) {
+        return window.getComputedStyle(elem, null)[prop];
+    }else {
+        return elem.crrentStyle[prop];
+    }
+}
+```
+
+
 
