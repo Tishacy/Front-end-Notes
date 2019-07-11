@@ -1176,3 +1176,194 @@ function addEvent(elem, type, handle) {
         
         
 
+## 事件对象
+
+### 事件对象
+
+事件对象会将事件发生时的各类参数作为属性存储在对象中。
+
+兼容性的写法：
+
+```js
+function handle(event) {
+    var event = event || window.event;
+}
+```
+
+其中，`window.event`是IE的写法
+
+### 事件源对象
+
+触发事件的源对象，事件源对象储存在事件对象中，可以通过下面的方式获取：
+
+-   `event.target` 火狐只有这个
+-   `event.srcElement` IE只有这个
+-   Chrome两个都有
+
+兼容性的写法：
+
+```js
+var target = event.target || event.srcElement;
+```
+
+
+
+## 事件委托
+
+利用事件冒泡，和事件源对象进行处理，将本该在子元素上绑定的事件，绑定给其父元素。
+
+优点：
+
+-   性能：不需要循环所有的子元素一个一个绑定
+-   灵活：当有新的子元素时不需要重新绑定事件
+
+**例子**：有十个`li`标签，绑定事件使得点击哪个`li`标签就显示该标签的内容。
+
+```html
+<ul>
+    <li>1</li>
+    <li>2</li>
+    <li>3</li>
+    <li>4</li>
+    <li>5</li>
+    <li>6</li>
+    <li>7</li>
+    <li>8</li>
+    <li>9</li>
+    <li>10</li>
+</ul>
+```
+
+由于事件冒泡，点击`li`标签的事件会冒泡至其父元素`ul`标签，因此，与其对每个`li`标签都绑定一个事件，不如只对其父元素绑定一个事件，然后通过触发父级元素的事件对象中获取事件源对象，即究竟点的是哪个子元素。代码如下：
+
+```js
+var ul = document.getElementsByTagName('ul')[0];
+ul.onclick = function (event) {
+    var event = event || window.event;
+    var target = event.target || event.srcElement;
+    console.log(target.innerText);
+}
+```
+
+
+
+**练习**：拖拽小方块
+
+```html
+<div class="box" style="width:100px;height:100px;background-color:#f00;position:absolute;left:0;right:0"></div>
+```
+
+```js
+function drag(elem) {
+    elem.addEventListener("mousedown", function (e) {
+        var event = e || window.event;
+        var dx = e.pageX - parseInt(elem.style.left),
+            dy = e.pageY - parseInt(elem.style.top);
+        function mouseMove(e) {
+            var evnet = e || window.event;
+            elem.style.left = e.pageX - dx + "px";
+            elem.style.top = e.pageY - dy + "px";
+        }
+        function mouseUp(e) {
+            document.removeEventListener('mousemove', mouseMove, false);
+        }
+        document.addEventListener('mousemove', mouseMove, false);
+        document.addEventListener('mouseup', mouseUp, false);
+    }, false);
+}
+```
+
+
+
+## 鼠标事件
+
+| 鼠标事件                | 含义                                          |
+| ----------------------- | --------------------------------------------- |
+| `click`                 | 鼠标左键点击事件，相当于`mousedown`+`mouseup` |
+| `mousedown`             | 按下鼠标事件，`event.button`可以监听左右键    |
+| `mouseup`               | 抬起鼠标事件，`event.button`可以监听左右键    |
+| `mousemove`             | 鼠标移动事件                                  |
+| `contextmenu`           | 鼠标右键菜单事件                              |
+| `mouserover/mouseenter` | 鼠标进入事件                                  |
+| `mouseout/mouseleave`   | 鼠标移出事件                                  |
+
+注意：
+
+-   `mousedown`和`mouseup`事件可以监听按下鼠标的哪个键，储存在其事件对象`event`中
+    -   `event.button` 值为0：鼠标左键
+    -   `event.button`值为1：鼠标滚轮
+    -   `event.button`值为2：鼠标右键
+-   DOM3标准规定：`click`事件只能监听鼠标左键
+
+ 
+
+**练习**：如何区分`mousedown/mouseup`和`click`事件
+
+Hint: 使用时间差，如果时间差小于300毫秒，为click，反之为`mousedown/mouseup`
+
+```js
+var firstTime = 0,
+    lastTime = 0,
+    key = true;		// 表示click的锁，为true表示是点击事件
+document.onmousedown = function (e) {
+    firstTime = new Date().getTime();
+}
+document.onmouseup = function (e) {
+    lastTime = new Date().getTime();
+    if (lastTime - firstTime > 300) {
+        console.log("it's mousedown and mouseup.");
+        key = false;
+    }else {
+        key = true;
+    }
+}
+document.onclick = function (e) {
+    if (key) {
+        console.log("it's clicking.");
+    }
+}
+```
+
+
+
+## 键盘事件
+
+| 键盘事件   | 含义       |
+| ---------- | ---------- |
+| `keypress` | 敲击键事件 |
+| `keydown`  | 按下键事件 |
+| `keyup`    | 抬起键事件 |
+
+注意：
+
+-   速度：`keydown`>`keypress`>`keyup`
+-   `keydown`和`keypress`的区别
+    -   `keydown`可以相应任意键盘按键（`fn`键除外，属于辅助键），`keypress`只可以响应字符类型键盘按键
+    -   `keypress`的事件对象中`event.charCode`返回ASCII码，可以转化为相应的字符，而`keydown`和`keyup`的事件对象中`event.charCode`返回0。
+        -   使用`String.fromCharCode(unicode编码)`可以转换成相应字符
+
+
+
+## 文本事件
+
+`input`标签有的事件
+
+| 文本事件 | 含义                                                         |
+| -------- | ------------------------------------------------------------ |
+| `input`  | 输入事件，只要`input`标签中的文本发生变化就会触发该事件      |
+| `change` | 内容改变事件，只有当`input`标签聚焦和失去焦点前后的内容发生变化才会触发该事件 |
+| `focus`  | 聚焦事件                                                     |
+| `blur`   | 失去焦点事件                                                 |
+
+**练习**：一个`input`标签，未聚焦时有`“请输入用户名”`的`value`，聚焦时内容消失，且输入文本之后失去焦点时不再产生`“请输入用户名”`的`value`。
+
+```html
+<input type="text" value="请输入用户名" onfocus="if (this.value=='请输入用户名'){this.value=""}" onblur="if (this.value==""){this.value='请输入用户名'}"></input>
+```
+
+
+
+## 窗体操作类事件（`window`上的事件）
+
+-   `scroll`：滚动事件，窗体滚动时触发的定位
+-   `load`：网页渲染以及所有文件下载完之后触发的事件。
