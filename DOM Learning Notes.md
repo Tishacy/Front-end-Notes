@@ -973,3 +973,206 @@ function getStyle(elem, prop) {
 
 
 
+# 事件
+
+## 绑定事件的3种方式
+
+-   `dom.on+事件类型 = function (event) {}`
+
+    ```js
+    var div = document.getElementsByTagName('div')[0];
+    div.onclick = function (e) {
+        console.log("I am clicked!");
+    }
+    ```
+
+    -   兼容性很好，但是一个元素的同一个事件上只能绑定一个处理函数
+    -   基本等同于写在HTML行间上
+
+-   `dom.addEventListener(事件类型, func, false)`
+
+    ```js
+    var div = document.getElementsByTagName('div')[0];
+    function print() {
+        cosole.log("I am clicked!");
+    }
+    div.addEventListener("click", print, false);
+    ```
+
+    -   IE9以下不兼容，可以为一个事件绑定多个处理函数
+    -   一个事件绑定同一个处理函数多次，只执行一次
+
+-   `dom.attachEvent('on'+事件类型, func)`
+
+    -   IE独有的方法，可以为一个事件绑定多个处理函数
+    -   一个事件板绑定一个处理函数多次，执行多次
+
+
+
+**练习**：给下面的`li`标签使用`addEventListener`绑定事件，输出其顺序。
+
+```html
+<ul>
+    <li>a</li>
+    <li>a</li>
+    <li>a</li>
+    <li>a</li>
+</ul>
+```
+
+错误代码：
+
+```js
+var li = document.getElementsByTagName('li'),
+    len = li.length;
+for (var i=0; i<len; i++) {
+    li[i].addEventListener("click", function () {
+        console.log(i);
+    }, false);
+}
+```
+
+错误原因：
+
+-   给`li`标签绑定事件的时候，形成了闭包，因此无论点击哪个标签，只会输出`4`。
+
+正确代码：
+
+-   使用立即执行函数解决闭包问题。
+
+```js
+var li = document.getElementsByTagName('li'),
+    len = li.length;
+for (var i=0; i<len; i++) {
+    (function (j) {
+        li[j].addEventListener("click", funciton () {
+       		console.log(j);                       
+       }, false);
+    } (i));
+}
+```
+
+
+
+## 绑定事件的运行环境
+
+-   `dom.on+事件类型 = function () {}`：程序this指向为dom元素本身
+
+-   `dom.addEventListener(事件类型, func, false)`：程序this指向为dom元素本身
+
+-   `dom.attachEvent(on+事件类型, func)`：程序this指向为window
+
+    -   为了让事件处理函数中的`this`指向dom元素本身，可以使用`call`或者`apply`的方法，如：
+
+        ```js
+        var div = document.getElementsByTagName('div')[0];
+        div.attachEvent("onclick", function (e) {
+            handle.call(div);
+            // 或 handle.apply(div, arguments);
+        });
+        function handle (e) {
+            console.log(this);
+        }
+        ```
+
+**练习**：封装兼容性的`addEvent(elem, type, handle)`方法
+
+```js
+function addEvent(elem, type, handle) {
+    if (elem.addEventListener) {
+        elem.addEventListener(type, handle, false);
+    }else if (elem.attachEvent) {
+        elem.attachEvent(on+type, function () {
+            handle.call(elem);
+        });
+    }else {
+        elem['on' + type] = handle;
+    }
+}
+```
+
+
+
+## 事件解除处理函数
+
+-   `dom.onclick = false/null/""`
+-   `dom.removeEventListener(事件类型, 事件处理函数, false)`
+-   `dom.detachEvent(on+事件类型, 事件处理函数)`
+
+**注意**：第二、三种方式中，若绑定匿名函数，则无法解除
+
+
+
+## 事件处理模型
+
+-   事件冒泡
+    -   结构上（非视觉上）嵌套关系的元素，会存在事件冒泡的功能，即同一个事件，自子元素冒泡向父元素。（自底向上）
+    -   取消冒泡的方法：
+        -   `event.stopPropagation()`：W3C标准，即不支持IE9以下版本
+        -   `event.cancelBubble = true;`：IE和谷歌都可以使用
+
+-   捕获
+
+    -   结构上（非视觉上）嵌套关系的元素，会存在事件捕获的功能，即同一个事件，子父元素捕获至子元素（事件源元素）。（自顶向下）
+
+    -   开启方法：
+
+        `dom.addEventListener(事件类型, func, true)`
+
+    -   IE没有捕获事件
+
+-   触发顺序，先捕获，后冒泡
+
+-   focus blur change submit reset select 等事件不冒泡
+
+-   阻止默认事件：
+
+    -   默认事件——表单提交，a标签跳转，右键菜单等
+
+    -   方法：
+
+        -   `return false` 以对象属性的方式注册的事件才生效，比如：
+
+        -   `event.preventDefault()`：W3C标准，IE9以下不兼容
+
+        -   `event.returnValue = false`：兼容IE
+          
+            ```js
+            // document.oncontextmenu 默认右键菜单事件
+            document.oncontextmenu = function (e) {
+                return false;
+                // e.preventDefault();
+                // e.returnValue = false;
+            }
+            ```
+        
+
+        **练习** ：封装兼容性的阻止默认事件的函数 `cancelHandler(event)`
+
+        ```js
+        function cancelHandle(event) {
+            if (event.preventDefault) {
+        event.preventDefault();
+            }else {
+                event.returnValue = false;
+            }
+        }
+        ```
+        
+        **a标签取消默认跳转的常用方法**：
+        
+        ```html
+        <a href="javascript:void(false)">demo</a>
+        ```
+        
+        `href`中可以写js代码，`void(xxx)`则相当于`return xxx`，因此等同于：
+        
+        ```js
+        var a = document.getElementsByTagName('a')[0];
+        a.onclick = function (e) {
+            return false;
+        }
+        ```
+        
+        
+
