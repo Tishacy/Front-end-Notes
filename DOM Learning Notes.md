@@ -1508,3 +1508,15 @@ js加载的缺点
     -   `new RegExp("regular expression");`
 
 具体的用法以及规则：[W3school RegExp对象](http://www.w3school.com.cn/js/jsref_obj_regexp.asp)
+
+**练习**：将`the-first-name`使用正则表达式替换为小驼峰式，即`theFirstName`
+
+```js
+var str = "the-first-name";
+var reg = /-(\w)/g;
+console.log(str.replace(reg, function ($, $1) {
+    return $1.toUpperCase();
+}));
+// theFirstName
+```
+
