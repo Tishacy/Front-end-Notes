@@ -761,3 +761,34 @@
     4. IE中使用自有的`attachEvent`函数绑定事件，其他浏览器使用`addEventListener`来绑定事件。
     </p>
     </details>
+
+---
+
+19. 如何获取一个字符串中的数字字符，并以数组形式输出  
+    `"afdsfadfdaf123fdsafsafdjklgj;kjr876asdfadsfadg6764asf"`
+    输出`[123, 876, 6764]`
+
+    <details>
+    <summary><b>答案</b></summary>
+    <p>
+
+    知识点：正则表达式
+
+    答案：
+    ```js
+    let str = "afdsfadfdaf123fdsafsafdjklgj;kjr876asdfadsfadg6764asf";
+    let regExp = /\d+/g;
+    console.log(str.match(regExp).map(Number));
+    ```
+    </p>
+    </summary>
+
+---
+
+20. `display: none` 和 `visibility: hidden` 的作用是什么？有什么区别？
+
+    <summary><b>答案</b></summary>
+    <p>
+    
+    
+    </p>
