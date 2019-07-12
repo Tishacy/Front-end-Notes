@@ -1367,3 +1367,144 @@ document.onclick = function (e) {
 
 -   `scroll`：滚动事件，窗体滚动时触发的定位
 -   `load`：网页渲染以及所有文件下载完之后触发的事件。
+
+
+
+# JSON
+
+JSON是一种传输数据的格式。
+
+-   以对象为样板，本质上就是对象
+-   与对象有用途上的区别，对象就是本地用的，json是用来传输用的
+
+json数据的转化：
+
+-   `JSON.parse()`：string—>json
+-   `JSON.stringify()`：json—>string
+
+```js
+var obj = {
+    "name": "tish",
+    "age": 18
+}
+
+var str = JSON.stringify(obj);
+console.log(str);
+// "{"name":"tish","age":18}"
+
+var json = JSON.parse(str);
+console.log(json);
+// Object {name: "tish", age: 18}
+```
+
+ 
+
+# 异步加载js
+
+js加载的缺点
+
+-   加载“工具方法”时没必要阻塞文档，否则会影响页面效率，一旦网速不好，整个网页将等待js加载而不进行后续的渲染工作。
+
+有些工具方法需要按需加载，用到再加载，不用不加载。
+
+
+
+## js异步加载的三种方法
+
+-   defer 异步加载，
+
+    -   等到dom文档全部解析完才会被执行
+    -   只有IE能用
+    -   也可以将代码写到`<script>`标签的内部
+
+    ```html
+    <script type="text/javascript" src="tools.js" defer="defer"></script>
+    ```
+
+    标签中属性名和属性值一样时，可以只写属性名，系统会自动识别，因此可以写成：
+
+    ```html
+    <script type="text/javascript" src="tools.js" defer></script>
+    ```
+
+-   async 异步加载
+
+    -   加载完就执行
+    -   IE9以下不能用
+    -   async只能加载外部脚本，不能把js写在`<script>`标签里面
+
+    ```html
+    <script type="text/javascript" src="tools.js" async></script>
+    ```
+
+-   动态创建script
+
+    -   **最常用的，兼容性最好**
+
+    ```js
+    function loadScript(url, callback) {
+        var script = document.createElement('script');
+        script.type = "text/javascript";
+        
+        // 等待js文件加载完毕之后执行其中的callback方法
+        if (script.readyState) {	// IE的方法
+            script.onreadystatechange = function () {
+                if (script.readyState == "complete" || script.readyState == "loaded") {
+                    eval(callback)();
+                }
+            }
+        }else {	// 除IE以外的其他浏览器的方法
+            script.onload = function () {
+    			eval(callback)();
+            }
+        }
+        
+        // 给script.src赋值，系统就开始开另一个线程进行异步下载
+        script.src = url;  
+        document.head.appendChild(script);
+    }
+    
+    loadScript("tools.js", "test");
+    ```
+
+    
+
+##  js加载时间线
+
+1.  创建Document对象，开始解析web页面。解析HTML元素和他们的文本内容然后添加Element对象和Text节点到文档中。这个阶段`document.readyState = ‘loading’`。
+2.  遇到link外部css，创建线程加载，并继续解析文档。
+3.  遇到script外部js，并且没有设置async defer，浏览器加载，并阻塞，等待js加载完成并执行该脚本，然后继续解析文档。
+4.  遇到script外部js，并且设有async defer，浏览器创建线程加载，并继续解析文档。对于async属性的脚本，脚本加载完之后立即执行。（异步禁止使用`document.write()`）
+5.  遇到img等，先正常解析dom结构，然后浏览器异步加载src，并继续解析文档。
+6.  当文档解析完成，`document.readyState = 'interactive'`。
+7.  文档解析完成后，所有设置为defer的script按照顺序执行。
+8.  文档解析完成后，document对象触发`DOMContentLoaded`事件，标志着程序执行从同步脚本执行阶段，转化为事件驱动阶段。
+9.  当所有async脚本加载完成并执行后，img等加载完成后，`document.readyState = 'complete'/'loaded'`，window对象触发`load`事件
+10.  从此，以异步响应方式处理用户输入、网络事件等。
+
+
+
+# 正则表达式
+
+## 课前补充
+
+-   转义符：`\`
+
+-   多行字符串：通过`\`将换行符转义掉来实现多行字符串。
+
+    ```js
+    "\
+    <div></div>\
+    <span></span>\
+    "
+    ```
+
+## RegExp
+
+正则表达式的作用：匹配特殊字符或有特殊搭配原则的字符的最佳选择。
+
+-   两种创建方式：
+    -   直接量（**推荐**）：`/regular expression/`
+    -   `new RegExp("regular expression");`
+
+具体的用法以及规则：[W3school RegExp对象](http://www.w3school.com.cn/js/jsref_obj_regexp.asp)
