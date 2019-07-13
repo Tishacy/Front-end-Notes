@@ -787,8 +787,53 @@
 
 20. `display: none` 和 `visibility: hidden` 的作用是什么？有什么区别？
 
+    <details>
     <summary><b>答案</b></summary>
     <p>
+
+    - 作用：`display: none`和`visibility: hidden`的作用是都可以使元素隐藏。
     
-    
+    - 区别：
+      - `display: none`：
+        - 元素和所有其子代元素都会被隐藏，且**不再占据原有空间**
+        - 父级设置为该属性后，无论子元素的`display`属性为何值，子元素都无法显示出来。
+        - 相当于元素消失了，会**影响计数器的的计数**，不再计入设置为`display: none`的元素，比如：
+            ```html
+            <ol>
+                <li>元素1</li>
+                <li style="display: none">元素2</li>
+                <li>元素3</li>
+                <li>元素4</li>
+            </ol>
+            ```
+            会显示：
+            <ol>
+                <li>元素1</li>
+                <li style="display: none">元素2</li>
+                <li>元素3</li>
+                <li>元素4</li>
+            </ol>
+      - `visibility: hidden`：
+        - 元素和所有其自带元素都会被隐藏，但是**仍然占据隐藏前的空间**
+        - 具有**继承性**，父级元素设置了该属性后，子元素也具有了`visibility: hidden`的属性，如果给自带元素设置为`visibility: visible`，那么子元素会显示出来
+        - 相当于元素只是隐形了，**不会影响计数器的计数**，比如：
+            ```html
+            <ol>
+                <li>元素1</li>
+                <li style="visibility: hidden">元素2</li>
+                <li>元素3</li>
+                <li>元素4</li>
+            </ol>
+            ```
+            会显示：
+            <ol>
+                <li>元素1</li>
+                <li style="visibility: hidden">元素2</li>
+                <li>元素3</li>
+                <li>元素4</li>
+            </ol>
     </p>
+    </details>
+
+  ---
+
