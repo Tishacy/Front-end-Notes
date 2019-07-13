@@ -837,3 +837,58 @@
 
   ---
 
+21. 下面代码输出什么？
+    ```js
+    var bar = 1;
+    function foo(bar) {
+        bar = 2;
+        alert(bar);
+    }
+    foo(bar);
+    alert(bar);
+    ```
+
+    <details>
+    <summary><b>答案</b></summary>
+    <p>
+
+    执行结果：`2 1`
+
+    知识点：函数作用域即预编译
+
+    解析：
+
+    1. 首先，进行全局预编译，得到GO：
+       ```js
+       GO = {
+           bar: undefined,
+           foo: function foo(bar) {/*...*/}
+       }
+       ```
+    2. 然后进行全局执行，执行第一句，得到：
+        ```js
+        GO = {
+            bar: 1,
+            foo: function foo(bar) {/*...*/}
+        }
+        ```
+        函数声明在预编译的时候已经看过，因此跳过，执行`foo(bar);`
+     3. 在执行`foo(bar)`的前一刻，进行`foo`函数的预编译，得到其执行期上下文AO：
+        ```js
+        foo.AO = {
+            bar: 1,
+        }
+        ```
+     4. 然后执行`foo`函数体内的语句，`bar = 2`，此时这里的`bar`从自己函数预编译产生的执行期上下文中找到，并赋值为2，此时`foo`的执行期上下文AO为：
+        ```js
+        foo.AO = {
+            bar: 2,
+        }
+        ```
+        然后，执行`alert(bar)`，弹出框显示为`2`。
+     5. 函数`foo`执行结束，销毁其执行器上下文。
+     6. 最后，执行最后一条语句`alert(bar)`，此时`bar`从全局中的GO中获取，因此弹出框显示为`1`。
+    </p>
+    </details>
+
+---
