@@ -7,6 +7,7 @@
     -   凡是遇到`{}`的时候，`{}`内部的作用域称之为块级作用域
     -   比如：`if (){/*xxx*/}` `for (){/*xxx*/}` `while () {/*xxx*/}` `function () {/*xxx*/}`
     -   块级作用域存在父子结构时，子作用域可以访问父级作用域的变量。
+-   在没有块级作用域的时候，可以使用立即执行函数来模拟块级作用域。
 
 
 
@@ -19,7 +20,9 @@
 `let`的使用方法与`var`一致：
 
 ```js
-let variable = value;
+let a = 123;
+let b;
+b = 345;
 ```
 
 
@@ -161,4 +164,62 @@ arr[2]();	// 3
 
     
 
-    
+### `const`
+
+#### `const`的使用方法
+
+```js
+const NUM = 123;
+```
+
+-   使用`const`定义的变量，无法进行修改。
+
+    ```js
+    const NUM = 123;
+    NUM = 345;
+    // Uncaught TypeError: Assignment to constant variable.
+    ```
+
+    **注意**：此处的变量不可修改分两种情况讨论：
+
+    -   如果使用`const`定义的变量是原始值：无法进行修改该原始值
+
+    -   如果使用`const`定义的变量是引用值：则无法修改该变量所指向的引用，但是具体的值可以通过引用值具有的方法来修改具体的引用值。比如：
+
+        ```js
+        const ARR = ["apple", "banana"];
+        
+        // 修改ARR所指的引用
+        ARR = [];
+        // Uncaught TypeError: Assignment to constant variable.
+        ```
+
+        ```js
+        const ARR = ["apple", "banana"];
+        
+        // 通过Array的push方法来修改ARR的引用值
+        ARR.push("orange");
+        console.log(ARR);
+        // ["apple", "banana", "orange"]
+        ```
+
+-   使用`const`定义变量时，声明和赋值必须写在一起。
+
+    ```js
+    const NUM;
+    NUM = 123;
+    // Uncaught SyntaxError: Missing initializer in const declaration
+    ```
+
+####  `const`的特性
+
+与`let`一样，具有以下特性：
+
+-   不进行预编译，不进行变量提升
+-   同级作用域下不能重复声明
+-   在块级作用域中使用`const`定义的变量，在该块级作用域外无法访问
+
+
+
+
+
