@@ -1,4 +1,4 @@
-<h1 style="fontsize:28px;text-align:center;font-family:Georgia;font-style:italic;color:#333">DOM Learning Notes</h1>
+<h1 style="fontsize:28px;text-align:center;font-family:Georgia;fonat-style:italic;color:#333">DOM Learning Notes</h1>
 [TOC]
 
 # 什么是DOM
