@@ -1,5 +1,4 @@
 <h1 style="fontsize:28px;text-align:center;font-family:Times;color:#333">JavaScript Learning Notes</h1>
-
 [TOC]
 
 # Web发展史
@@ -501,7 +500,7 @@
 
   - `String()`：将括号内的东西转化为字符串
 
-  - `demo.toString()`：将括号内的东西转化为字符串
+  - `demo.toString()`：将`demo`转化为字符串
 
     - 例子
 
@@ -522,6 +521,21 @@
       var res = parseInt(num, 2).toString(16); // 先用parseInt从2进制转成10进制，再用toString从10进制转成16进制
       console.log(res);
       ```
+      
+    - **补充**，各基本数据类型的包装类都有`toString`方法，均继承自`Object.prototype.toString`方法，但是各数据类型的包装类分别重写了各自的`toString`方法，总结如下：
+
+        | 数据类型  | 数据                                  | 调用toString()的结果           |
+        | --------- | ------------------------------------- | ------------------------------ |
+        | Number    | `Number(123)`                         | `"123"`                        |
+        | Number    | `Number(NaN)`                         | `"NaN"`                        |
+        | String    | `String('123')`                       | `"123"`                        |
+        | Boolean   | `Boolean(true)`<br />`Boolean(false)` | `"true"`<br />`"false"`        |
+        | undefined | `undefined`                           | 不可用                         |
+        | Object    | `var obj = {name:"123"}`              | `"[object Object]"`            |
+        | Object    | `null`                                | 不可用                         |
+        | Array     | `[1, 2, 3]`                           | `"1,2,3"`                      |
+        | Array     | `[1,2,3,[4,[5,{a:[546, 8]}]]]`        | `"1,2,3,4,5,[object Object]"`  |
+        | Function  | `function fn(a){return a++}`          | `"funciton fn(a){return a++}"` |
 
   - `Boolean()`：将括号内的东西转化为布尔型
 
@@ -660,67 +674,67 @@ if (11 + "11" * 2 == 33) {
 >
 > 1. 在JavaScript中，形参数量和实参数量可以不等。
 >
->    ```js
->    function test(a, b, c) {
->        document.write(a + " ");
->        document.write(b + " ");
->        document.write(c + " ");
->    }
->    
->    // 实参数量小于形参
->    test(1, 2)
->    // 1 2 undefined
->    
->    // 实参数量大于形参
->    test(1, 2, 3, 4)
->    // 1 2 3
->    ```
+> ```js
+> function test(a, b, c) {
+>     document.write(a + " ");
+>     document.write(b + " ");
+>     document.write(c + " ");
+> }
+> 
+> // 实参数量小于形参
+> test(1, 2)
+> // 1 2 undefined
+> 
+> // 实参数量大于形参
+> test(1, 2, 3, 4)
+> // 1 2 3
+> ```
 >
->    当实参数量大于形参的时候，虽然实参没有完全赋值给形参，但是在每个函数体内部，系统会自动生成一个类数组型的变量`arguments`，储存了传入函数的所有实参。
+> 当实参数量大于形参的时候，虽然实参没有完全赋值给形参，但是在每个函数体内部，系统会自动生成一个类数组型的变量`arguments`，储存了传入函数的所有实参。
 >
->    ```js
->    function test () {
->        console.log(arguments);
->        console.log(arguments.length);
->        for (var i = 0; i < arguments.length; i++) {
->            console.log(arguments[i]);
->        }
->    }
->    test(1, 2, 3);
->    // [1,2,3]
->    // 3
->    // 1
->    // 2
->    // 3
->    ```
+> ```js
+> function test () {
+>     console.log(arguments);
+>     console.log(arguments.length);
+>     for (var i = 0; i < arguments.length; i++) {
+>         console.log(arguments[i]);
+>     }
+> }
+> test(1, 2, 3);
+> // [1,2,3]
+> // 3
+> // 1
+> // 2
+> // 3
+> ```
 >
 > 2. 形参的数目为`函数名.length`, 实参的数目为`arguments.length`。
 >
 > 3. 当形参数目小于或等于实参的时候，形参和`arguments`的相应值是一一映射的；当形参数目大于实参的时候，传进了值的形参和`arguments`的相应值是一一映射的，没传进值的形参与`arguments`不映射。
 >
->    ```js
->    // 形参少于等于实参
->    function test(a, b) {
->        a = 2;
->        b = 3;
->        console.log(arguments[0]);
->        console.log(arguments[1]);
->    }
->    test(1, 1);
->    // 2 3
->    
->    // 形参多于实参
->    function test(a, b, c) {
->        a = 2;
->        b = 3;
->        c = 4;
->        console.log(arguments[0]);
->        console.log(arguments[1]);
->        console.log(arguments[2]);
->    }
->    test(1, 1);
->    // 2 3 undefined
->    ```
+> ```js
+> // 形参少于等于实参
+> function test(a, b) {
+>     a = 2;
+>     b = 3;
+>     console.log(arguments[0]);
+>     console.log(arguments[1]);
+> }
+> test(1, 1);
+> // 2 3
+> 
+> // 形参多于实参
+> function test(a, b, c) {
+>     a = 2;
+>     b = 3;
+>     c = 4;
+>     console.log(arguments[0]);
+>     console.log(arguments[1]);
+>     console.log(arguments[2]);
+> }
+> test(1, 1);
+> // 2 3 undefined
+> ```
 
 
 
@@ -2685,7 +2699,7 @@ function deepClone(origin, target) {
 
   ```js
   var arr = [1,2,3,4];
-  splice(-1, 1);			// 返回 4
+  arr.splice(-1, 1);			// 返回 4
   cosnole.log(arr);		// [1,2,3]
   ```
 
