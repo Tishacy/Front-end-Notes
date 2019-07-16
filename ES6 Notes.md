@@ -378,3 +378,221 @@ console.log(str);
 
     -   `n`只能是正整数，为0时返回空串
 
+
+
+# 扩展运算符
+
+## `...` 用法
+
+`…array`：将数组/类数组`array`中的元素展开。
+
+```js
+var arr = [1, 2, 3];
+console.log(arr);		// [1, 2, 3]
+console.log(...arr);	// 1 2 3
+```
+
+
+
+## 应用实例
+
+-   应用实例1：给函数传参数
+
+    ```js
+    function show(...a) {
+        console.log(a);
+    }
+    show(1,2,3,4,5);
+    // [1, 2, 3, 4, 5]
+    ```
+
+    相当于：
+
+    ```js
+    function show() {
+        console.log(Array.prototype.slice.call(arguments));
+    }
+    show(1,2,3,4,5);
+    // [1, 2, 3, 4, 5]
+    ```
+
+-   应用实例2：当做rest**运算符取函数的剩余参数**
+
+    ```js
+    function show(a, b, ...restArgs) {
+        console.log(a, b);
+        console.log(restArgs);
+    }
+    show(1,2,3,4,5);
+    // 1 2
+    // [3, 4, 5]
+    ```
+
+-   应用实例3：浅拷贝一份数组，即原始值的引用不同，而引用值依然使用相同引用的拷贝。
+
+    -   传统ES5写法应
+        -   方法1：`new Array()`，然后循环遍历依次插入数据；
+        -   方法2：使用`Array.from(array)`来浅拷贝数组`array`
+        -   方法3：使用`Array.prototype.slice.call(array)`，或者`array.slice()`
+    -   ES6中，使用`...`运算符可以简单地完成数组的浅拷贝。
+
+    ```js
+    var arr = [1,2,3,4,{name:'tish'}];
+    var arrCopy = [...arr];
+    console.log(arrCopy);
+    // [1, 2, 3, 4, 5]
+    ```
+
+
+
+## 其他
+
+-   使用`…`也可以将字符串转化为数组
+
+    ```js
+    var str = "1234567890";
+    console.log([...str]);
+    // ["1", "2", "3", "4", "5", "6", "7", "8", "9", "0"]
+    ```
+
+    等同于，`Array.from(str);`
+
+
+
+# 函数
+
+## 函数默认参数
+
+### 默认参数用法
+
+```js
+function fn(a="1", b="2") {
+    console.log(a, b);
+}
+fn();					// 1 2
+fn("3");				// 3 2
+fn(undefined, "4");		// 1 4
+fn("3", "4");			// 3 4
+```
+
+### 默认参数注意事项
+
+-   只有当传入的参数为`undefined`时，才会使用默认参数值。
+
+-   形参赋上默认值后，函数内部不可以使用`let` `const`再次声明，否则会报错。但是可以使用`var`来重复声明。
+
+    ```js
+    function fn(a="1") {
+        let a = 2;
+        console.log(a);
+    }
+    fn();
+    // Uncaught SyntaxError: Identifier 'a' has already been declared
+    ```
+
+    
+
+## 箭头函数
+
+### 箭头函数用法
+
+-   `(参数) => 返回值`
+
+    ```js
+    var add = (a, b) => a + b;
+    // 等同于
+    var add = function (a, b) {
+        return a + b;
+    }
+    ```
+    
+- `(参数) => {函数语句}`：**常用**
+
+    ```js
+    var show = (name) => {
+        console.log(name);
+        return true;
+    }
+    // 等同于
+    var show = function (name) {
+        console.log(name);
+        return true;
+    }
+    ```
+
+### 箭头函数的注意事项
+
+- 箭头函数的`this`指向
+
+    -   箭头函数中的`this`，**指向的是函数定义时所在的对象**，而不是谁调用`this`就指向谁。
+
+        **实例**：等待2秒使用`json.show`打印出`json.id`
+        - 如果使用正常的函数
+
+        ```js
+            var json = {
+                id : 123,
+                show: function () {
+                    setTimeout(function () {
+                        console.log(this.id);
+                    }, 2000);
+                }
+            };
+            json.show();
+            // undefined
+        ```
+
+        原因是函数执行时，`console.log(this.id)`中的`this`由于是`setTimout`调用的，而`setTimeout`是window在调用，因此`this`指向的是window。
+
+        解决该闭包问题，可以使用立即执行函数：
+
+        ```js
+            var json = {
+                id: 123,
+                show: function () {
+                    (function (id){
+                        setTimeout(function (){
+                            console.log(id);
+                        }, 2000)
+                    }(this.id))
+                }
+            };
+            json.show();
+            // 123
+        ```
+
+        -   使用箭头函数的话，由于`this`指向函数定义时的`this`，而不是函数执行时谁调用就指向谁，因此不会产生闭包的问题。
+
+            ```js
+            var json = {
+                id: 123,
+                show: function () {
+                    setTimeout(()=>{
+                        console.log(this.id);
+                    }, 2000)
+                }
+            };
+            json.show();
+            ```
+
+
+
+- 箭头函数中没有`arguments`
+
+    ```js
+    var func = ()=>{console.log(arguments)};
+    func(1,2,3);
+    // Uncaught ReferenceError: arguments is not defined.
+    ```
+
+    可以使用扩展运算符来替代：
+
+    ```js
+    var func = (...args)=>{console.log(args)};
+    func(1,2,3);
+    // [1, 2, 3]
+    ```
+
+- 箭头函数不能当做构造函数
+
+
