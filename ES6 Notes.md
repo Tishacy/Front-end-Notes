@@ -278,3 +278,103 @@ show({name: "tish", gender: "male"});
 // tish male
 ```
 
+
+
+# 字符串
+
+## 字符串模板
+
+```js
+var name = "tish",
+    age = 18;
+var str = `名字是${name}，
+年龄为${age}`;
+console.log(str);
+// 名字是tish，
+// 年龄为18
+```
+
+### 使用方法
+
+-   使用 \`\` 来将字符串包裹
+-   使用`${变量名}`来将变量赋进去
+
+### 优点
+
+-   \`\`支持换行，里面可以使用多行字符串
+
+### 应用场景
+
+-   JS生成dom结构，即已有从后端传入的json数据，批量生成dom结构
+
+    ```html
+    <ul id="list">
+    </ul>
+    
+    <script>
+        var data = [
+            {title: "new1", readTimes: "100"},
+            {title: "new2", readTimes: "100"},
+            {title: "new3", readTimes: "100"},
+            {title: "new4", readTimes: "100"},
+            {title: "new5", readTimes: "100"},
+        ];
+        var ul = document.getElementById('list');
+        for (let i=0; i<data.length; i++) {
+            let {title, readTimes} = data[i];
+            let li = document.createElement('li');
+            li.innerHTML = `<span class="title">${title}</span>
+    						<span class="readTimes">${readTimes}</span>`;
+            ul.appendChild(li);
+        }
+    </script>
+    ```
+
+    
+
+## 字符串的新增方法
+
+-   字符串查找：`str.includes(subStr)`：判断`str`中是否含有`subStr`
+
+    -   若有，返回`true`，否则为`false`
+
+    -   相当于ES5中的`(str.indexOf(subStr) != -1)`
+    -   应用实例：判断浏览器类型是否为Chrome
+
+        ```js
+        if (navigator.userAgent.includes("Chrome")) {
+            console.log("Chrome");
+        }else {
+            console.log("not Chrome.")
+        }
+        // Chrome
+        ```
+
+-   字符串是否以`subStr`开头：`str.startsWith(subStr)`
+
+    -   若是，返回`true`，否则为`false`
+
+    -   应用实例：判断某链接地址的协议是否为https
+
+        ```js
+        var url = "https://google.com";
+        console.log(url.startsWith("https"));
+        // true
+        ```
+
+-   字符串是否以`subStr`结尾：`str.endsWith(subStr)`
+
+    -   若是，返回`true`，否则为`false`
+
+    -   应用实例：判断文件的扩展名，比如判断是否为jpg格式文件
+
+        ```js
+        var fname = "./asdf.jpg"
+        console.log(fname.endsWith('jpg'));
+        // true
+        ```
+
+-   重复字符串`n`次：`str.repeat(n);`
+
+    -   `n`只能是正整数，为0时返回空串
+
