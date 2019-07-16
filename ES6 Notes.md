@@ -221,5 +221,60 @@ const NUM = 123;
 
 
 
+# 解构赋值
 
+非常有用，特别是在做数据交互的时候（如Ajax），当后台传来json数据后，可以很方便地将json数据解构为前端需要的各种变量。
+
+## 数组解构赋值
+
+```js
+// 数组解构赋值
+let [a, b, c] = [1, 2, 3];
+console.log(a, b, c);
+// 1 2 3
+```
+
+**练习**：已有两个变量`a` `b`，交换二者的值
+
+```js
+var a = 1,
+    b = 2;
+// swap a b
+[a, b] = [b, a];
+console.log(a, b);
+// 2, 1
+```
+
+*类似于Python的`(a, b) = (b, a)`*。
+
+
+
+## 对象解构赋值
+
+```js
+// 对象解构赋值
+// 设有json对象如下：
+let json = {
+    "name": "tish",
+    "age": 18,
+    "gender": "male"
+}
+// 解构赋值如下：
+let {name, gender:sex, age} = json;
+console.log(name, age, sex);
+// tish 18 male
+```
+
+-   `let {name, gender:sex, age} = json` 中只需要将键放在`{}`即可，键的顺序可以随意
+-   键的名称必须要跟所赋值的对象中的键名一致，否则找不到对应的键名。如果要将所赋值对象中的键名对应到另一个名字上，则可以使用`oldKey:newKey`的形式，其中`oldKey`为所赋值对象中的键名，`newKey`为新定义的变量名，如上述代码中的`gender:sex`就是相当于`let sex = json.gender`。
+
+当函数传入对象时，也可以在传参的位置进行解构。
+
+```js
+function show({name:user, gender:sex}) {
+    console.log(user, sex);
+}
+show({name: "tish", gender: "male"});
+// tish male
+```
 

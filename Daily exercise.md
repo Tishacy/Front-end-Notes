@@ -149,8 +149,8 @@
    ```js
    for (var i=0; i<5; i++) {
        setTimeout(function() {
-           console.log(j);
-       }, j * 1000);
+           console.log(i);
+       }, i * 1000);
    }
    ```
    <details><summary><b>答案</b></summary>
@@ -835,7 +835,7 @@
     </p>
     </details>
 
-  ---
+---
 
 21. 下面代码输出什么？
     ```js
