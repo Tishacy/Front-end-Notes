@@ -44,6 +44,23 @@ function curry(func) {
 }
 ```
 
+使用ES6写法：
+
+```js
+function curry(func, ...fixedArgs) {
+    return function (...restArgs){
+        var totalArgs = fixedArgs.concat(restArgs);
+        if (totalArgs.length >= func.length) {
+            return func(...totalArgs);
+        }else {
+            return curry(func, ...totalArgs);
+        }
+    }
+}
+```
+
+
+
 ### 柯里化函数的使用
 
 #### 1. 固定参数
