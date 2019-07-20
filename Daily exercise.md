@@ -892,3 +892,33 @@
     </details>
 
 ---
+
+22. 下面的代码输出什么
+    ```js
+    var x = 1,
+        y = 2;
+    function show() {
+        var x = 3;
+        return {
+            x: x,
+            fun: function (a, b) {
+                x = a + b;
+            }
+        }
+    }
+    var obj = show();
+    obj.fun(x, y);
+    console.log(obj.x);
+    console.log(x);
+    ```
+
+    <details><summary><b>答案</b></summary>
+    <p>
+    
+    执行结果：
+    ```bash
+    3
+    1
+    ```
+    </p>
+    </details>
