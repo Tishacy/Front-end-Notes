@@ -596,3 +596,192 @@ fn("3", "4");			// 3 4
 - 箭头函数不能当做构造函数
 
 
+
+# 数组
+
+## ES5新增的方法
+
+-   `arr.forEach(callback, this=window)`：代替普通的for循环，无返回值
+
+    -   回调函数`callback`中的形参分别为`val` `index` `arr`
+    -   `this`参数可以修改循环中的`this`指向
+        -   如果回调函数是箭头函数的话，那么this指向不改变，即始终指向函数定义时的对象。
+
+    ```js
+    let arr = [1, 2, 3, 4, 5];
+    
+    arr.forEach(function (val, index, arr) {
+        console.log(this, val, index, arr);
+    }, 123);
+    // Number(123) 1 0 [1, 2, 3, 4, 5]
+    // Number(123) 2 1 [1, 2, 3, 4, 5]
+    // Number(123) 3 2 [1, 2, 3, 4, 5]
+    // Number(123) 4 3 [1, 2, 3, 4, 5]
+    // Number(123) 5 4 [1, 2, 3, 4, 5]
+    
+    arr.forEach((val, index, arr)=>{
+        console.log(this, val, index, arr);
+    }, 123);
+    // Window 1 0 [1, 2, 3, 4, 5]
+    // Window 2 1 [1, 2, 3, 4, 5]
+    // Window 3 2 [1, 2, 3, 4, 5]
+    // Window 4 3 [1, 2, 3, 4, 5]
+    // Window 5 4 [1, 2, 3, 4, 5]
+    ```
+
+-   `arr.map(callback, this)`：**非常有用**，映射
+
+    -   配合return，返回一个新数组
+    -   没有return时，相当于`forEach`，会返回含有`arr.length`长度的数组，但是内部元素全是`undefined`。
+
+    ```js
+    let arr = [1, 2, 3, 4, 5];
+    
+    let newArr = arr.map((val, index, arr)=>{
+    	val += 10;
+    });
+    console.log(newArr);
+    // [undefined, undefined, undefined, undefined, undefined]
+    
+    let newArr1 = arr.map((val, index, arr)=>{
+        val +=10;
+        return val;
+    });
+    console.log(newArr1);
+    // [11, 12, 13, 14, 15]
+    ```
+
+    -   应用实例：更改数组的数据结构
+
+        ```js
+        var data = [
+            {'title': 'aaa', read: 100},
+            {'title': 'bbb', read: 200},
+            {'title': 'ccc', read: 300}
+        ];
+        
+        var newData = data.map((item, index, arr)=>{
+            return {
+                't': item.title,
+                'r': item.read + 200,
+            }
+        })
+        console.log(newData);
+        // [{…}, {…}, {…}]
+        // 0: {t: "aaa", r: 300}
+        // 1: {t: "bbb", r: 400}
+        // 2: {t: "ccc", r: 500}
+        // length: 3
+        // __proto__: Array(0)
+        ```
+
+-   `arr.filter(callback)`：根据条件过滤元素
+
+    -   回调函数`callback`返回值为`true`就保留该元素，`false`就去除该元素
+
+    ```js
+    var data = [
+        {'title': 'aaa', read: 100},
+        {'title': 'bbb', read: 200},
+        {'title': 'ccc', read: 300}
+    ];
+
+    // 筛选出read＞100的数据
+    var filteredData = data.filter((item, index, arr)=>{
+        return item.read > 100;
+    })
+    console.log(filteredData);
+    // (2) [{…}, {…}]
+    // 0: {title: "bbb", read: 200}
+    // 1: {title: "ccc", read: 300}
+    // length: 2
+    // __proto__: Array(0)
+    ```
+
+-   `arr.some(callback)`：数组里面存在一个元素符合条件，返回`true`
+
+-   `arr.every(callback)`：数组里面所有元素都符合条件，返回`true`
+
+    ```js
+    var data = [
+        {'title': 'aaa', read: 100},
+        {'title': 'bbb', read: 200},
+        {'title': 'ccc', read: 300}
+    ];
+    
+    // 判断data中是否有title为aaa的元素
+    var some = data.some((item, index, arr)=>{
+        return item.title == 'aaa';
+    });
+    console.log(some);	// true
+    
+    // 判断data中是否所有title都是aaa
+    var every = data.every((item, index, arr)=>{
+        return item.title == 'aaa';
+    });
+    console.log(every);	// false
+    ```
+
+-   `arr.reduce(callback)`：
+
+    -   回调函数`callback`有四个参数，分别是`prev` `cur` `index ` `arr`
+    -   其中`prev`是上一次`callback`的返回结果，第一次循环的时候为数组的第一个值
+    -   应用实例：求数组的和、连乘
+
+    ```js
+    var arr = [1,2,3,4,5,6,7,8,9,10];
+    
+    // 数组求和
+    console.log(arr.reduce((prev, cur, index, arr)=>{
+        return prev + cur;
+    }));
+    // 55
+    
+    // 数组的连乘
+    console.log(arr.reduce((prev, cur, index, arr)=>{
+        return prev * cur;
+    }))
+    // 3628800
+    ```
+
+-   `arr.reduceRight(callback)`：
+
+    -   与`reduce`用法相同，只不过是从右往左遍历数组并赋值给`cur`（最后一个元素除外）进行运算。
+    -   `prev`是上一次`callback`的返回结果，第一次循环的时候为数组的最后一个值
+
+
+
+## ES6新增的方法
+
+-   `for <Item> of <Array Iterator> `
+
+    -   `arr.values()`：数组值Iterator
+
+    -   `arr.keys()`：数组下标Iterator
+
+    -   `arr.entries()`：数组实体Iterator
+
+    -   `for <Item> of <Array Iterator>`用法：
+
+        ```js
+        var arr = [1,2,3,4,5,6,7,8,9,10];
+        
+        for (let val of arr.values()) {	// 或者直接 for (let val of arr) {...}
+            console.log(val);
+        }
+        
+        for (let key of arr.keys()) {
+            console.log(key);
+        }
+        
+        for (let [key, val] of arr.entries()) {
+            console.log(key, val);
+        }
+        ```
+
+-   `arr.find(callback)`：找出第一个符合条件的数组元素，如果没找到，返回`undefined`
+
+-   `arr.findIndex(callback)`：找出第一个符合条件的数组元素的索引，如果没找到，返回`-1`
+
+-   `arr.includes(item)`：判断数组中是否含有某元素，有则返回`true`，反则返回`false`
+
