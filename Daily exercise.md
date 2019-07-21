@@ -362,7 +362,7 @@
 
 ---
 
-9. 使用`typeof bar===='object'`来确定bar是否是一个对象时有什么潜在的缺陷？这个陷阱如何避免？
+9. 使用`typeof bar==='object'`来确定bar是否是一个对象时有什么潜在的缺陷？这个陷阱如何避免？
    <details><summary><b>答案</b></summary>
    <p>
 
