@@ -876,9 +876,33 @@ new Vue({
           // [ 1, 2, 3, { a: 456 }, [ 3, 987, 5 ] ]
           // [ 123, 2, 3, { a: 456 }, [ 3, 987, 5 ] ]
           ```
-      
-          
-      
-      
-      
-         
+
+
+
+# Promise
+
+## 语法
+
+```js
+let promise = new Promise(function (resolve, reject){
+    // resolve	成功时调用
+    // reject	失败时调用
+});
+promise.then(res=>{
+    console.log(res);
+}, err=>{
+    console.log(err);
+})
+```
+
+常用方法：
+
+```js
+new Promise().then(res=>{/* ... */}).catch(err=>{/* ... */});
+```
+
+
+
+
+
+   
