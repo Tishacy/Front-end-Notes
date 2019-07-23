@@ -785,3 +785,100 @@ fn("3", "4");			// 3 4
 
 -   `arr.includes(item)`：判断数组中是否含有某元素，有则返回`true`，反则返回`false`
 
+
+
+# 对象
+
+## 对象简洁语法
+
+```js
+var name = "aaa",
+    age = 123;
+
+let obj = {
+    name,	// 相当于 name: name
+    age,	// 相当于 age: age
+    eat() {	// 相当于 eat: function () {...}, 注意不能是箭头函数
+        console.log('eating');
+    }
+}
+```
+
+实例：新建Vue实例
+
+```js
+new Vue({
+    router,
+    App,
+    vuex
+});
+```
+
+
+
+## 对象新增方法
+
+-   `Object.is()`：比较两个值是否相等，长得一样的都返回`true`
+
+    -   `Object.is(NaN, NaN)`：`true`
+    -   `Object.is(+0, -0)`：`false`
+
+-   `Object.assign(target, source1, source2, ...)`：
+
+    -   用法1：合并对象
+
+        -   `target`通常使用一个新的空对象`{}`，`source1, source2, …` 是需要合并的对象，如果有重复的`key`，则后者覆盖前者。
+
+        -   常见用法如下：
+
+            ```js
+            let json = {a:1},
+                json2 = {b:2, a:2},
+                json3 = {c:3};
+            let data = Object.assign({}, json, json2, json3);
+            console.log(data);
+            // {a:2, b:2, c:3}
+            ```
+
+            再比如，使用Ajax时，合并默认参数和用户传入的参数：
+
+            ```js
+            function ajax(options) {
+                let defaults = {
+                    type: 'get',
+                    header: '',
+                    data: {}
+                }
+                let totalOptions = Object.assign({}, defaults, options);
+            }
+            ```
+
+    -   用法2：浅拷贝一个对象或数组
+
+      -   `let copiedArr = Object.assign([], arr)`
+      
+      -   `let copiedObj = Object.assing({}, obj)`
+      
+      -   注意：该方法是浅拷贝
+      
+          ```js
+          let arr = [1,2,3,{a:123}, [3,4,5]];
+          let newArr = Object.assign([], arr);
+          console.log(arr);
+          console.log(newArr);
+          newArr[0] = 123;
+          newArr[3].a = 456;
+          newArr[4][1] = 987;
+          console.log(arr);
+          console.log(newArr);
+          // [ 1, 2, 3, { a: 123 }, [ 3, 4, 5 ] ]
+          // [ 1, 2, 3, { a: 123 }, [ 3, 4, 5 ] ]
+          // [ 1, 2, 3, { a: 456 }, [ 3, 987, 5 ] ]
+          // [ 123, 2, 3, { a: 456 }, [ 3, 987, 5 ] ]
+          ```
+      
+          
+      
+      
+      
+         
