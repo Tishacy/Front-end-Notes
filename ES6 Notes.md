@@ -903,6 +903,63 @@ new Promise().then(res=>{/* ... */}).catch(err=>{/* ... */});
 
 
 
+# 模块化
+
+注意：需要放到服务器环境。
+
+## 基本用法
+
+-   如何定义模块
+
+    ```js
+    // ./module.js
+    export const a = 123;
+    
+    const x = 1,
+          y = 2,
+          z = 3;
+    export {x, y, z};
+    
+    export default d = 5;
+    ```
+
+-  如何使用模块
+
+    ```html
+    <script type="module">
+        import './module.js';	// 相当于引入文件  
+        import {a} from './module.js';
+        import {x as xx, y as yy, z as zz} from './module.js';
+        import d from './module.js'
+        import * as mod from './module.js'
+        
+        console.log(a);				// 123
+        console.log(xx, yy, zz);	// 1 2 3
+        console.log(d);				// 5
+        console.log(mod.a, mod.x) 	// 123 1
+    </script>
+    ```
+
+-   特点：
+    -   `import`可以是相对路径，也可以是绝对路径
+    -   `import`相同的模块只会导入一次
+    -   `import`有提升功能，自动提升到顶部首先执行
+    -   导入的模块内容如果有定时器更改变量内容，那使用该模块时也会发生改动。
 
 
-   
+
+## 动态引入
+
+`import()`类似node里面的`require`，可以动态引入。使用方法如下：   
+
+```js
+import('./module.js').then(res=>{
+    console.log(res.a + res.b);
+});
+```
+
+-   优点：
+    -   按需加载
+    -   可以写到`if`中
+    -   模块路径也可以是动态的路径，如路径可以是一个函数的执行结果
+
