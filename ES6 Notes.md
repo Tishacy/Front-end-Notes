@@ -963,3 +963,128 @@ import('./module.js').then(res=>{
     -   可以写到`if`中
     -   模块路径也可以是动态的路径，如路径可以是一个函数的执行结果
 
+
+
+# 类和继承
+
+## 类的定义
+
+### 声明形式
+
+```js
+class Person {
+    constructor(name, age) {	// 调用new时自动执行
+        this.name = name;		// 实例的属性
+        this.age = age;
+    }
+    showName() {				// 实例的方法
+        return `名字为 ${this.name}`;
+    }
+    showAge() {
+        return `年龄为 ${this.age}`;
+    }
+    static sayHi(){				// 静态方法，类的方法
+        console.log('Hello ES6.');
+    }
+}
+```
+
+相当于ES5中对类的定义：
+
+```js
+function Person(name, age) {
+    this.name = name;
+    this.age = age;
+}
+Person.prototype.showName = function() {	// 实例的方法
+    return `名字为 ${this.name}`;
+}
+Person.prototype.showAge = function() {		// 实例的方法
+    return `年龄为 ${this.age}`;
+}
+Person.sayHi = function() {					// 静态方法，类的方法
+    console.log('Hello ES6.');
+}
+```
+
+```js
+let pers = new Person('tish', 18);
+console.log(pers.showName());	// tish
+Person.sayHi();					// Hello ES6.
+```
+
+
+
+### 表达式形式
+
+```js
+let Person = class {
+    constructor(name, age) {  
+        this.name = name;
+        this.age = age;
+    }
+    showName() {console.log(this.name)};
+}
+```
+
+### 注意
+
+-   使用`class`定义的类，本质上是构造函数
+
+    ```js
+    let Person = class{};
+    console.log(typeof Person);
+    // function
+    ```
+
+-   使用`class`定义的类，必须配合`new`使用，否则会报错
+
+    ```js
+    let Person = class{};
+    Person();
+    // Uncaught TypeError: Class constructor Person cannot be invoked without 'new'
+    ```
+
+-   使用`class`定义没有提升功能，必须在定义类之后再调用。
+
+
+
+## 类的继承
+
+```js
+// 父类
+class Person{
+    constructor(name){
+        this.name = name;
+    }
+    showName() {
+        console.log(`名字是 ${this.name}`);
+    }
+}
+
+// 子类
+class Student extends Person {
+    constructor(name, skill) {
+        super(name);		// 这一句相当于是执行父类的构造函数，把父类的属性和方法拿过来，而且是继承所必需有的，否则会报错
+        this.skill = skill;
+    }
+    showName() {
+        super.showName();	// 调用父级的方法执行
+    }
+    showSkill() {
+        console.log(`Skill is ${this.skill}`);
+    }
+}
+
+// 调用
+let stu = new Student('tish', 'study');
+stu.showName();		// 名字是 tish
+stu.showSkill();	// Skill is study
+```
+
+-   使用`class Son extends Parent`来实现继承
+-   其中子类的构造函数`constructor`中必须使用`super()`来将父级的属性和方法继承过来
+-   在子类中调用父类的方法时，使用`super.parentMethod()`来实现
+
+
+
