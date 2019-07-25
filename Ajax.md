@@ -68,6 +68,18 @@ xmlhttp.open(method, url, async);
 
 
 
+### 避免使用缓存数据
+
+在IE浏览器中使用AJAX时，如果GET请求的地址url如果是一样的话，那么只会请求一份，其余的从缓存中读取，如果url文件的内容发生变化，那么使用AJAX请求的数据并不会实时更新，为了避免使用缓存数据，可以通过增加随机数参数或者时间参数来每次构造不同的url进行请求。
+
+```js
+xmlhttp.open("GET", `${url}?r=${Math.random()}`, true);
+// 或者
+xmlhttp.open("GET", `${url}?t=${new Date().getTime()}`, true);
+```
+
+
+
 ## 3. 发送请求
 
 ### 发送GET请求
@@ -138,3 +150,4 @@ xmlhttp.onreadystatechange = function() {
 
 
 
+# 

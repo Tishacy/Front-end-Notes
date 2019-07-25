@@ -828,7 +828,7 @@ console.log("耗时", lastTime - firstTime, "毫秒");
 **练习**：求元素相对于文档的坐标 `getElementPosition`
 
 ```js
-Element.prototype.getElementPosition() = function () {
+Element.prototype.getElementPosition = function () {
     var left = this.offsetLeft,
         top = this.offsetTop,
         elem = this;
