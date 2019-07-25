@@ -152,8 +152,6 @@ xmlhttp.onreadystatechange = function() {
 
 # 封装AJAX
 
-## AJAX-GET
-
 ```js
 function json2str(json) {
     /** 将json数据转化为字符串格式
@@ -173,19 +171,29 @@ function json2str(json) {
 }
 
 
-function getAjax(url, data, timeout, succes, error) {
+function getAjax(method, url, data, timeout, succes, error) {
     /** AJAX by GET method
      * 使用GET方法发送AJAX请求，请求成功时执行success回调函数，请求失败时执行error回调函数。
      * 
+     * @param {string} method 请求方式，"GET"或"POST"
      * @param {string} url 请求地址
+     * @param {object} data 请求的数据，json格式
+     * @param {int} timeout 设置超时时间 
      * @param {function} success GET请求成功时的回调函数
      * @param {function} error GET请求失败时的回调函数
      */
     let dataStr = json2str(data);
     let timer;
     let xmlhttp = (window.XMLHttpRequest)? new XMLHttpRequest() : new ActiveXObject("Microsoft.XMLHTTP");
-    xmlhttp.open("GET", `${url}?${dataStr}`, true);
-    xmlhttp.send();
+    if (method === "GET") {
+        xmlhttp.open("GET", `${url}?${dataStr}`, true);
+        xmlhttp.send();        
+    }else {
+        xmlhttp.open("POST", url, true);
+        xmlhttp.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
+        xmlhttp.send(dataStr);
+    }
+
     xmlhttp.onreadystatechange = function (e) {
         if (xmlhttp.readyState === 4) {
             clearTimeout(timer);
@@ -208,8 +216,10 @@ function getAjax(url, data, timeout, succes, error) {
 
 需要注意的问题：
 
--   将GET数据由json数据转化为字符串格式，使用`json2str`函数
+-   将GET/POST数据由json数据转化为字符串格式，使用`json2str`函数
 -   使用`Math.random()`或者`new Date().getTime()`作为GET的参数之一，来避免请求缓存数据
 -   url中不能出现中文字符，因此需要通过`encodeURI`或`encodeURIComponent`函数来将url转码，但是为了避免`=`也被转码，因此需要分别将各数据参数的`key`和`value`进行转码，以及将原url进行转码，再进行拼接
 -   使用`timeout`来设置AJAX请求的超时问题
+
+
 
