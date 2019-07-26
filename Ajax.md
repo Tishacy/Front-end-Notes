@@ -152,6 +152,8 @@ xmlhttp.onreadystatechange = function() {
 
 # 封装AJAX
 
+## 基本封装
+
 ```js
 function json2str(json) {
     /** 将json数据转化为字符串格式
@@ -171,7 +173,7 @@ function json2str(json) {
 }
 
 
-function getAjax(method, url, data, timeout, succes, error) {
+function ajax(method, url, data, timeout, succes, error) {
     /** AJAX by GET method
      * 使用GET方法发送AJAX请求，请求成功时执行success回调函数，请求失败时执行error回调函数。
      * 
@@ -185,7 +187,7 @@ function getAjax(method, url, data, timeout, succes, error) {
     let dataStr = json2str(data);
     let timer;
     let xmlhttp = (window.XMLHttpRequest)? new XMLHttpRequest() : new ActiveXObject("Microsoft.XMLHTTP");
-    if (method === "GET") {
+    if (method.toLowerCase() === "get") {
         xmlhttp.open("GET", `${url}?${dataStr}`, true);
         xmlhttp.send();        
     }else {
@@ -208,7 +210,7 @@ function getAjax(method, url, data, timeout, succes, error) {
         timer = setTimeout(()=>{
             console.log("中断请求");
             xmlhttp.abort();
-            clearInterval(timer);
+            clearTimeout(timer);
         }, timeout);
     }
 }
@@ -220,6 +222,112 @@ function getAjax(method, url, data, timeout, succes, error) {
 -   使用`Math.random()`或者`new Date().getTime()`作为GET的参数之一，来避免请求缓存数据
 -   url中不能出现中文字符，因此需要通过`encodeURI`或`encodeURIComponent`函数来将url转码，但是为了避免`=`也被转码，因此需要分别将各数据参数的`key`和`value`进行转码，以及将原url进行转码，再进行拼接
 -   使用`timeout`来设置AJAX请求的超时问题
+
+
+
+## 完善封装
+
+为了解决AJAX传参的顺序问题，将封装的`ajax`函数的参数换成参数对象。
+
+```js
+let json2str = function(data) {
+    /** 将json数据转化为字符串格式
+    * 
+    * @param {object} json 传入的json数据
+    * @return {string} str 传出的字符串数据，格式为'key1=value1&key2=value2'
+    */
+    let res = [];
+    for (let key in data) {
+        key = encodeURI(key);
+        let val = encodeURI(data[key]);
+        res.push(`${key}=${val}`);
+    }
+    return res.join("&");
+}
+
+let ajax = function(options) {
+    /** ajax function
+     *
+     * @param {object} options 参数对象
+     *     options = {
+     *         @param {string} method 请求方式，"GET"或“POST”
+     *         @param {string} url 请求地址
+     *         @param {string} data 请求数据
+     *         @param {object} headers 请求头
+     *         @param {number} timeout 请求超时时间
+     *         @param {function} success 请求成功回调函数
+     *         @param {function} error 请求失败会滴啊函数
+     *     }
+     */
+    let timer;
+    let xhr = (window.XMLHttpRequest)? new XMLHttpRequest() : new ActiveXObject("Microsoft.XMLHTTP");
+    if (options.method.toLowerCase() === "get") {
+        url = (options.data)? `${options.url}?${options.data}` : options.url;
+        xhr.open("GET", url, true);
+        xhr.send();
+    }else {
+        xhr.open("POST", `${options.url}`, true);
+        for (let header in options.headers) {
+            xhr.setRequestHeader(header, options.headers[header]);
+        }
+        xhr.send(options.data);
+    }
+    xhr.onreadystatechange = function (e) {
+        if (xhr.readyState === 4) {
+            clearTimeout(timer);
+            if (xhr.status >= 200 && xhr.status < 300 || xhr.status === 304) {
+                options.success(xhr);
+            }else {
+                options.error(xhr);
+            }
+        }
+    }
+    if (options.timeout) {
+        timer = setTimeout(()=>{
+            xhr.abort();
+            clearTimeout(timer);
+        }, options.timeout);
+    }
+}
+
+```
+
+使用方法：
+
+```js
+ajax({
+    type: "GET",
+    url: "ajax.php",
+    data: "userName=ss&userPwd=123456",
+    success: function(xhr) {
+        console.log(xhr.status);
+    },
+    error: function(xhr) {
+        console.log(xhr.status);
+    }
+})
+```
+
+
+
+# 使用Jquery发送AJAX
+
+```html
+<script src="http://code.jquery.com/jquery-latest.js"></script>
+<script>
+	$.ajax({
+        type: "GET",
+        url: "ajax.php",
+        data: "userName=ss&userPwd=123456",
+        success: function(msg) {
+            console.log(msg);
+        },
+        error: function(xhr) {
+            console.log(xhr.status);
+        }
+    })
+</script>
+```
 
 
 
