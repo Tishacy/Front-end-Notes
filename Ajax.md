@@ -310,7 +310,7 @@ ajax({
 
 
 
-# 使用Jquery发送AJAX
+# 使用jQuery发送AJAX
 
 ```html
 <script src="http://code.jquery.com/jquery-latest.js"></script>
@@ -328,6 +328,8 @@ ajax({
     })
 </script>
 ```
+
+
 
 
 
