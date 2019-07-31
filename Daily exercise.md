@@ -922,3 +922,42 @@
     ```
     </p>
     </details>
+
+---
+
+23. 下面代码输出什么
+    
+    ```js
+    var globalVar = "xyz";
+    (function outerFunc(outerArg) {
+        var outerVar = "a";
+        (function innerFunc(innerArg) {
+            var innerVar = "b";
+            console.log(
+                "outerArg = " + outerArg + "\n" +
+                "innerArg = " + innerArg + "\n" +
+                "outerVar = " + outerVar + "\n" +
+                "innerVar = " + innerVar + "\n" +
+                "globalVar = " + globalVar);
+        })(456);
+    })(123);
+    ```
+
+    <details>
+    <summary>答案</summary>
+    <p>
+    知识点：立即执行函数、作用域及预编译
+
+    执行结果：
+
+    ```
+    outerArg = 123
+    innerArg = 456
+    outerVar = a
+    innerVar = b
+    globalVar = xyz
+    ```
+
+    解析：子级函数的作用域中含有父级函数的作用域，因此可以实现变量的访问。立即执行函数只是在执行之后清除其引用，在执行前依然进行正常的预编译。
+    </p>
+    </details>
