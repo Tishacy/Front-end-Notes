@@ -993,3 +993,41 @@
     ```
     </p>
     </details>
+
+25. 下面代码输出结果是什么
+    ```js
+    var a = false;
+    var res = a / 0;
+    if (res) {
+        console.log(res*2 + '2' + 4);
+    }else {
+        console.log(!res*2 + '2' + 4);
+    }
+    ```
+
+    <details>
+    <summary>答案</summary>
+    <p>
+  
+    知识点：隐式类型转换
+    
+    执行结果：
+    ```
+    224
+    ```
+
+    解释：
+    ```js
+    var a = false;      // a => false
+    var res = a / 0;    // res => NaN
+    if (res) {          // Boolean(res) => true
+        console.log(res*2 + '2' + 4);  // NaN24
+    }else {
+        console.log(!res*2 + '2' + 4); 
+        // !res => true
+        // true*2 => 2
+        // 2 + '2' + 4 => 224
+    }
+    ```
+    </p>
+    </details>
