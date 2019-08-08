@@ -66,4 +66,168 @@
     })
     ```
 
+
+
+## jQuery的核心函数
+
+jQuery的核心函数是：
+
+```js
+$(args);
+```
+
+其中参数`args`：
+
+-   接收一个函数`callback`：相当于`$(document).ready(callback)`
+
+    即：等待dom树构建完成后就执行的代码，即入口函数
+
+    ```js
+    $(function () {
+        alert("hello jquery.");
+    });
     
+    // 等价于
+    $(document).ready(function() {
+        alert("hello jquery.");
+    })
+    ```
+
+-   接收一个字符串
+
+    -   接收一个字符串选择器，得到DOM元素列表（jQuery对象，类数组）
+
+        ```js
+        $('img');
+        $('.className');
+        $('#idName');
+        ```
+
+    -   接收一个html片段，会创建相应的DOM元素
+
+        ```js
+        $("<p>This is a paragraph</p>");
+        ```
+
+-   接收一个DOM元素，会被包含成为一个jQuery对象（类数组）
+
+    ```js
+    var box = document.getElementsByClassName('demo')[0];
+    var $box = $(box);
+    console.log($box);
+    // n.fn.init [div#box.demo, context: div#box.demo]
+    ```
+
+
+
+## jQuery的each方法
+
+-   原生JS中的**数组**的forEach方法，没有返回值
+
+    ```js
+    let arr = [1, 2, 3, 4, 5];
+    arr.forEach(function (value, index) {
+        console.log(index, value);
+    })
+    // 0 1
+    // 1 2
+    // 2 3
+    // 3 4
+    // 4 5
+    ```
+
+- 原生JS中**类数组**的forEach方法：通过`Array.prototype.forEach`来实现，没有返回值
+
+    ```js
+    function List() {
+        this.length = 0;
+        this.push = Array.prototype.push;
+        this.splice = Array.prototype.splice;
+        this.forEach = Array.prototype.forEach;	// *
+    }
+    
+    let list = new List();
+    for (let i=0; i<5; i++) {
+        list.push(i+1);
+    }
+    list.forEach((value, index)=>console.log(index, value));
+    // 0 1
+    // 1 2
+    // 2 3
+    // 3 4
+    // 4 5
+    ```
+
+-   jQuery的each静态方法：
+
+    `$.each(arr, callback)$`
+
+    -   `arr`：需要遍历的数组，可以是数组或者类数组
+    -   `callback(index, value)`：回调函数，注意与原生的`Array.prototype.forEach`的回调函数的参数顺序不一样
+    -   返回值：返回传入的`arr`
+
+```js
+let arr = [1, 2, 3, 4, 5];
+$.each(arr, (index, value)=>console.log(index, value));
+// 0 1
+// 1 2
+// 2 3
+// 3 4
+// 4 5
+
+let list = {0:1, 1:2, 2:3, 3:4, 4:5, length:5};
+$.each(list, (index, value)=>{console.log(index, value)});
+// 0 1
+// 1 2
+// 2 3
+// 3 4
+// 4 5
+```
+
+
+
+## jQuery的map方法
+
+-   原生JS的map方法：只能遍历数组，类数组不可以
+
+    ```js
+    let arr = [1, 2, 3, 4, 5];
+    let newArr = arr.map(function (value, index, array) {
+        console.log(index, value, array);
+        return value+10;
+    });
+    console.log(newArr);
+    // [11, 12, 13, 14, 15]
+    ```
+
+-   jQuery中的map方法：数组/类数组都可以遍历
+
+    -   数组
+
+        ```js
+        let arr = [1, 2, 3, 4, 5];
+        let newArr = $.map(arr, function (value, index) {
+             return value+10;
+         });
+        console.log(newArr);
+        // [11, 12, 13, 14, 15]
+        ```
+    
+    -   类数组：返回一个真数组
+    
+        ```js
+        let obj = {0:1, 1:2, 2:3, 3:4, 4:5, length:5};
+        let newObj = $.map(obj, function (value, index) {
+            return value+10;
+        });
+        console.log(newObj);
+        // [11, 12, 13, 14, 15]
+        ```
+    
+        
+    
+          
+
+
+​    
+
