@@ -1560,6 +1560,36 @@ oPerson1.say(); // 1
 
 新`new`的对象的作用域链会重新产生，因此与之前生成的对象相互独立。
 
+
+
+## 对象静态方法和实例方法
+
+-   静态方法：直接给类添加的方法就是静态方法
+-   实例方法：直接给实例添加的方法就是实例方法（原型链上的方法）
+
+### 静态方法
+
+```js
+function Person() {
+Person.speak = (word)=>{console.log(word)};
+
+Person.speak("Hello jquery");
+// Hello jquery
+```
+
+### 实例方法
+
+```js
+function Person() {}
+Person.prototype.speak = (word)=>{console.log(word)};
+
+let pers = new Person();
+pers.speak("Hello jquery");
+// Hello jquery
+```
+
+
+
 ## 包装类
 
 - `new String(<字符串原始值>);`
