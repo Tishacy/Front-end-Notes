@@ -1,3 +1,5 @@
+<h1 style="fontsize:28px;text-align:center;font-family:Georgia;font-style:italic;color:#333">jQuery Notes</h1>
+
 [TOC]
 
 # jQuery简介
@@ -95,12 +97,13 @@ $(args);
 
 -   接收一个字符串
 
-    -   接收一个字符串选择器，得到DOM元素列表（jQuery对象，类数组）
+    -   接收一个字符串选择器（CSS选择器，可以组合），得到DOM元素列表（jQuery对象，类数组）
 
         ```js
         $('img');
         $('.className');
         $('#idName');
+        $('parent child');
         ```
 
     -   接收一个html片段，会创建相应的DOM元素
@@ -120,7 +123,9 @@ $(args);
 
 
 
-## jQuery的each方法
+## jQuery的静态方法
+
+### jQuery的each方法
 
 -   原生JS中的**数组**的forEach方法，没有返回值
 
@@ -186,7 +191,7 @@ $.each(list, (index, value)=>{console.log(index, value)});
 
 
 
-## jQuery的map方法
+### jQuery的map方法
 
 -   原生JS的map方法：只能遍历数组，类数组不可以
 
@@ -225,9 +230,108 @@ $.each(list, (index, value)=>{console.log(index, value)});
         ```
     
         
+
+###  jQuery中的其他静态方法
+
+-   `$.trim(string)`：去除字符串两边的空格，返回处理后的字符串
+
+-   `$.isWindow(obj)：判断是否为`window`对象
+
+-   `$.isArray(obj)`：判断是否为真数组（不包括类数组）
+
+-   `$.isFunction(obj)`：判断是否为函数（包括构造函数、立即执行函数等）
+
+-   `$.holdReady(boolean)`：
+
+    -   传入`true`：暂停ready执行代码
+    -   传入`false`：恢复ready执行代码
+
+    >   ready执行
+    >
+    >   `$(document).ready(function () {/* ready执行的代码 */});`
+
+
+
+## jQuery的内容选择器
+
+假设有html结构如下：
+
+```html
+<div id="1"></div>
+<div id="2">  </div>
+<div id="3"><!--This is a comment--></div>
+<div id="4">This is text.</div>
+<div id="5">
+    <span></span>
+</div>
+```
+
+- `:parent`: 找到有文本内容或者有子元素的指定元素
+
+    ```js
+    let d = $("div:parent");
     
-          
+    console.log(d);
+    // n.fn.init [div#2, prevObject: n.fn.init(1), context: document, selector: "div:parent"]
+    
+    console.log(d[0]);
+    // <div id="2">  </div>
+    ```
 
+-   `:empty`：找到既没有文本元素也没有子元素的指定元素（可以包含注释节点）
 
-​    
+    ```js
+    let d = $("div:empty");
+    
+    ```
+
+console.log(d);
+    // n.fn.init(2) [div#1, div#3, prevObject: n.fn.init(1), context: document, selector: "div:empty"]
+    ```
+    
+- `:contains(text)`：找到包含某段文本的指定元素
+
+    ```js
+    let d = $("div:contains('This')");
+    
+    console.log(d);
+    // n.fn.init [div#4, prevObject: n.fn.init(1), context: document, selector: "div:contains("This")"]
+    ```
+
+-   `:has(selector)`：找到包含指定子元素的指定元素
+
+    ```js
+    let d = $("div:has('span')");
+    
+    console.log(d);
+    // n.fn.init [div#5, prevObject: n.fn.init(1), context: document, selector: "div:has("span")"]
+    ```
+
+ 
+
+## jQuery-attr方法
+
+-   `$(selector).attr(args)`：获取或者设置属性节点的值
+
+    -   `args`为一个参数，代表**获取**属性节点的值
+    -   `args`为两个参数，代表**设置**属性节点的值
+
+    ```html
+    <span class="line"></span>
+    ```
+
+    ```js
+    $("span").attr("class");
+    // "line"
+    
+    $('span').attr('class', 'span')
+    // n.fn.init [span.span, prevObject: n.fn.init(1), context: document, selector: "span"]
+    
+    $('span').attr('class')
+    // "span"
+    ```
+
+    
+
+- 
 
