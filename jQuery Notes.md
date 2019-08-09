@@ -459,3 +459,82 @@ for (let i=0; i<btnNum; i++) {
 }
 ```
 
+
+
+## jQuery文本值相关操作
+
+-   html
+    -   `$(selector).html()`：获取DOM元素内部HTML信息，等价于`domElement.innerHTML`
+    -   `$(selector).html(“<p>This is a paragraph.</p>”)`：给DOM元素内添加HTML，等价于`domElement.innerHTML = “<p>This is a paragraph</p>”`
+-   text
+    -   `$(selector).text()`：获取DOM元素内部text信息，等价于`domElement.innerText`
+    -   `$(selector).text(“sentence”)`：给DOM元素内添加text，等价于`domElement.innerText = “sentence”`
+-    value
+    -   `$(selector).val()`：获取含value属性的DOM元素（如input元素）的value值
+    -   `$(selector).val(“请输入内容”)`：给含value属性的DOM元素的value赋值
+
+
+
+## jQuery操作css样式
+
+-   jQuery获取css样式（可以获取dom的所有css样式）： `$(selector).css(key)`
+-   jQuery设置css样式（设置的是行间样式）
+
+    -   逐个设置：`$(selector).css(key, value)`
+
+        ```js
+        $("div").css("width", "100px");
+        $("div").css("height", "100px");
+        $("div").css("background-color", "red");
+        ```
+
+    -   链式设置：`$(selector).css(“width”, “100px”).css(“height”, “100px”).css(“background-color”, “red”)`
+
+        >   注意：链式设置CSS尽量不要超过三个，否则代码阅读性太差。
+
+    -   **批量设置（推荐）**：
+
+        ```js
+        $(selector).css({
+            width: "100px",
+            height: "100px",
+            background-color: "red"
+        });
+        ```
+
+
+
+## jQuery操作尺寸和位置
+
+- DOM元素的宽度：
+    - 获取：`$(selector).width()`
+    - 设置：`$(selector).width("100px")`
+- DOM元素的高度：
+    - 获取：`s(selector).height()`
+    - 设置：`$(selector).height(“100px”)`
+- DOM元素的位置：
+    - offset：元素距离窗口的偏移位置
+        - 获取`$(selector).offset()`
+        -   设置`$(selector).offset({top: 10, left: 10}));`
+        
+     ```html
+    <div style="position: absolute; top: 100px; left:100px; widht: 100px; height: 100px"></div>
+     ```
+
+    ```js
+    $("div").offset();
+    // {top: 100, left: 100}
+    
+    $("div").offset({top: 200, left: 200});
+    $("div").offset();
+    // {top: 200, left: 200}
+    ```
+    
+    - position：元素距离定位元素的偏移位置
+    
+        - 获取`$(selector).position()`
+    
+        >   注意：position只能获取不能设置
+
+
+
