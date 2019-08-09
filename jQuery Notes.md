@@ -538,3 +538,18 @@ for (let i=0; i<btnNum; i++) {
 
 
 
+## jQuery的scrollTop方法
+
+-   获取DOM元素的滚动偏移位：`$(selector).scrollTop()`
+-   设置DOM元素的滚动偏移位：`$(selector).scrollTop(50)`
+-   获取窗口的滚动偏移位：`$("html").scrollTop() + $("body").scrollTop()`
+    -   IE和其他浏览器中，`$(“html”).scrollTop()`和`$(”body“).scrollTop()`必定有一个有值，且必定不同时有值，因此应用时将二者相加已解决兼容性问题
+    
+-   设置窗口的滚动偏移位：`$("html, body").scrollTop(50)`
+
+
+
+
+
+
+
