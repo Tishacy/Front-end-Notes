@@ -549,6 +549,48 @@ for (let i=0; i<btnNum; i++) {
 
 
 
+## jQuery的事件绑定与移除方法
+
+### 事件绑定
+
+-   `$(selector).eventName(function () {/*...*/})` ：只支持JS部分常用事件
+-   `$(selector).on(“eventName”, function () {/*...*/})`：支持JS全部的事件
+
+注意：
+
+-   使用jQuery对同一元素绑定的相同事件不会相互覆盖，事件触发后按绑定顺序依次执行，与原生JS中的`addEventListener`方法一致
+-   原生JS中的`addEventListener`方法对同一元素绑定的相同事件之间不会相互覆盖，但是使用`on+事件名称`（比如`onclick`）方法对同一元素绑定的相同事件，后绑定的事件会覆盖之前绑定的事件。
+
+### 事件移除
+
+- `$(selector).off(args)`：
+    - 不传参：移除该元素的所有事件
+    - 传一个参数：`$(selector).off(eventName)`
+        - 比如：`$(selector).off(“click”)`会移除选定元素的所有`click`事件
+    - 传两个参数：`$(selector).off(eventName, eventFunc)`
+        - 比如：`$(selector).off(“click”, eventFunc)`会移除选定元素所绑定的`eventFunc`的click事件
+
+例子**
+
+```html
+<button>Click</button>
+```
+
+```js
+// Define 2 event functions.
+let event1 = ()=>console.log("You hit the event1.");
+let event2 = ()=>console.log("You hit the event2.");
+
+// Add 2 click events to the button.
+$("button").click(event1);
+$('button').click(event2);
+
+// Remove the click event1 from the button.
+$('button').off("click", event1);
+```
+
+
+
 
 
 
