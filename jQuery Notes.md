@@ -405,4 +405,57 @@ $.each(list, (index, value)=>{console.log(index, value)});
         // undefined
         ```
 
-        
+
+
+## jQuery操作类（class）相关的方法
+
+- `addClass()`：添加class，多个class之间用空格隔开
+- `removeClass()`：删除class，多个class之间用空格隔开
+- `toggleClass()`：切换class，即有相应的class时就删除，没有时就添加相应class，多个class之间用空格隔开
+
+ **例子**
+
+```html
+<!-- HTML part -->
+<button>box</button>
+<button>red</button>
+<button>blue</button>
+<button>border</button>
+
+<div></div>
+```
+
+```css
+/* CSS part */
+* {
+    margin: 0;
+    padding: 0;
+}
+.box {
+    width: 100px;
+    height: 100px;
+}
+.red {
+    background-color: red;
+}
+.blue {
+    background-color: blue;
+}
+.border {
+    border: 1px solid black;
+}
+```
+
+```js
+// JS part
+// 假设已经引入jQuery库
+let btns = $("button"),
+    btnNum = btns.length;
+for (let i=0; i<btnNum; i++) {
+    btns[i].onclick = function () {
+        let className = this.innerText;
+        $("div").toggleClass(className);
+    }
+}
+```
+
