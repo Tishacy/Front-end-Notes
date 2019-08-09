@@ -1,5 +1,4 @@
 <h1 style="fontsize:28px;text-align:center;font-family:Georgia;font-style:italic;color:#333">jQuery Notes</h1>
-
 [TOC]
 
 # jQuery简介
@@ -283,9 +282,7 @@ $.each(list, (index, value)=>{console.log(index, value)});
     ```js
     let d = $("div:empty");
     
-    ```
-
-console.log(d);
+    console.log(d);
     // n.fn.init(2) [div#1, div#3, prevObject: n.fn.init(1), context: document, selector: "div:empty"]
     ```
     
@@ -331,7 +328,81 @@ console.log(d);
     // "span"
     ```
 
+- `$(selector).removeAttr(args)`：删除一个或多个属性节点
+
+    ```html
+    <span class="span" id="123"></span>
+    ```
+
+    ```js
+    $("span").removeAttr("class id");
+    // n.fn.init [span, prevObject: n.fn.init(1), context: document, selector: "span"]
     
+    $("span")[0];
+    // <span></span>
+    ```
 
-- 
+## jQuery-prop方法
 
+-   `$(selector).prop(args)`：获取或设置dom元素的属性
+    -   `args`为一个参数，代表获取属性的值
+    -   `args`为两个参数，表示设置属性的值
+    
+    ```html
+    <span class="line"></span>
+    ```
+
+    ```js
+    $("span").prop("class");
+    // "line"
+    
+    $('span').prop('class', 'span')
+    // n.fn.init [span.span, prevObject: n.fn.init(1), context: document, selector: "span"]
+    
+    $('span').prop('class')
+    // "span"
+    ```
+
+- `$(selector).removeAttr(args)`：删除一个或多个dom元素的属性
+
+    ```html
+    <span class="span" id="123"></span>
+    ```
+
+    ```js
+    $("span").removeProp("class id");
+    // n.fn.init [span, prevObject: n.fn.init(1), context: document, selector: "span"]
+    
+    $("span")[0];
+    // <span></span>
+    ```
+
+-   注意点：
+
+    -   prop方法不仅能操作属性，还能操作属性节点
+
+    -   在操作属性节点时：
+
+        -   如果具有`true`和`false`两个属性的属性节点，如`checked` `selected` `disabled`，使用`prop()`，因为输出为`true`/`false`对判断有好处
+        -   反之使用`attr()`
+
+        **例子**
+
+        ```html
+        <input type="checkbox" checked>
+        <input type="checkbox">
+        ```
+
+        ```js
+        console.log($("input").eq(0).prop("checked"));
+        console.log($("input").eq(1).prop("checked"));
+        // true
+        // false
+        
+        console.log($("input").eq(0).attr("checked"));
+        console.log($("input").eq(1).attr("checked"));
+        // checked
+        // undefined
+        ```
+
+        
