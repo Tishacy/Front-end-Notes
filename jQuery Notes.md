@@ -251,6 +251,23 @@ $.each(list, (index, value)=>{console.log(index, value)});
 
 
 
+## jQuery的find方法
+
+- 查找某元素的子元素：`$(selector).find(subSelector)`
+
+```html
+<div class="father">
+    <div class="son"></div>
+</div>
+```
+
+```js
+$('div.father').find('div.son')[0];
+// <div class="son"></div>
+```
+
+
+
 ## jQuery的内容选择器
 
 假设有html结构如下：
@@ -570,7 +587,7 @@ for (let i=0; i<btnNum; i++) {
     - 传两个参数：`$(selector).off(eventName, eventFunc)`
         - 比如：`$(selector).off(“click”, eventFunc)`会移除选定元素所绑定的`eventFunc`的click事件
 
-例子**
+**例子**
 
 ```html
 <button>Click</button>
@@ -591,7 +608,154 @@ $('button').off("click", event1);
 
 
 
+## jQuery事件冒泡和默认行为
+
+-   事件冒泡：子类元素触发的事件向父类元素传播
+
+-   阻止事件冒泡：
+
+    -   在子类元素的事件中用`return false`
+    -   `event.stopPropagation()`：阻止冒泡事件
+
+    -   `event.returnValue = false`：兼容IE
+
+    ```js
+    $("div").click(function (event) {
+        /* event function here */
+        return false;
+        // 或者
+        // event.preventDefault();
+        // event.returnValue = false;
+    })
+    ```
+    -   默认事件：有些标签系统自带的一些事件为默认事件，比如`input:submit`的提交，`a`标签的跳转
+
+-   阻止默认事件
+    -   在所触发的事件中`return false`
+    -   `event.preventDefault()`：阻止默认事件
 
 
 
+## jQuery事件自动触发
+
+-   `$(selector).trigger(eventName)`：自动触发事件，
+
+    -   **会触发事件冒泡**
+    -   **会触发默认事件**
+
+    ```js
+    $("div.btn").trigger("click");
+    ```
+
+-   `$(selector).triggerHandler(eventName)`：也是自动触发事件，
+    -   **不会触发事件冒泡**
+    -   **不会触发默认事件，`a`标签跳转除外**
+
+    ```js
+    $("div.btn").triggerHandler("click");
+    ```
+
+**面试题**：让`a`标签事件自动触发，并且跳转
+
+```html
+<a><span>自动跳转</span></a>
+```
+
+```js
+// 利用span冒泡来使a标签跳转
+$("span").click = function () {
+    console.log("跳转");
+}
+$("span").trigger("click");
+```
+
+
+
+## jQuery自定义事件
+
+-   事件必须是通过`on`绑定
+
+-   触发事件必须通过`trigger`/`triggerHandler`触发
+
+```html
+<div></div>
+```
+
+```js
+$("div").on("myClick", function () {
+    console.log("Hit myClick event");
+});
+$("div").trigger("myClick");
+```
+
+
+
+## jQuery事件命名空间
+
+-   事件必须通过`on绑定
+-   `on`绑定的事件名称为`eventName.someone`，表示是`someone`定义的事件
+    -   使用这样的命名空间不会影响原事件的触发，比如`$(selector).on(“click.name1”, eventFunc)`不会影响click事件的触发
+-   触发事件必须通过`trigger`/`triggerHandler`触发
+
+```html
+<div></div>
+```
+
+```js
+// 按命名空间绑定事件
+$("div").on("click.pers1", ()=>console.log("pers1's click event."));
+$("div").on("click.pers2", ()=>console.log("pers2's click event."));
+```
+
+```js
+// 触发事件
+$("div").trigger("click.pers1");
+```
+
+注意：
+
+- 使用`trigger`触发子类的事件时，会冒泡给具有相同命名空间的事件
+
+    **例子**
+
+    下面的事件触发输出结果是什么
+
+    ```html
+    <div class="father">
+        <div class="son"></div>
+    </div>
+    ```
+
+    ```js
+    // 绑定事件
+    $(".father").on("click", function () {
+        console.log("father no pers")
+    });
+    $(".father").on("click.pers1", function () {
+        console.log("father pers1");
+    });
+    $(".father").on("click.pers2", function () {
+        console.log("father pers2");
+    });
+    $(".son").on("click.pers1", function () {
+        console.log("son pers1");
+    });
+    
+    // 触发事件
+    $(".son").trigger("click.pers1");
+    ```
+
+    输出结果：
+
+    ```
+    son pers1
+    father pers1
+    ```
+
+    解析：
+
+    -   当子类`.son`触发了`click.pers1`事件时，会冒泡给父类的`click.pers1`事件
+    -   如果父类没有对应的命名空间的事件，则不会冒泡触发父类中的事件
+
+    
 
