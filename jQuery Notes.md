@@ -759,3 +759,76 @@ $("div").trigger("click.pers1");
 
     
 
+## jQuery动效
+
+### 显示/隐藏
+
+-   显示：`$(selector).show(speed, callback)`
+    -   `speed`：显示的速度
+        -   数字：毫秒
+        -   特定字符串：`"slow"` `"normal"` `"fast"`
+    -   `callback`：回调函数，显示完之后执行的函数
+    
+-   隐藏：`$(selector).hide(speed, callback)` (参数同上)
+-   切换：`$(selector).toggle(speed, callback)`(参数同上)
+
+### 下拉/上收
+
+-   下拉：`$(selector).slideDown(speed, callback) ` (参数同上)
+-   上收：`$(selector).slideUp(speed, callback)` (参数同上)
+-   slide切换：`$(selector).toggle(speed, callback)` (参数同上)
+
+### 淡入/淡出
+
+-   淡入：`$(selector).fadeIn(speed, callback)` （参数同上）
+-   淡出：`$(selector).fadeOut(speed, callback)` （参数同上）
+-   fade切换：`$(selector).fadeToggle(speed, callback)` (参数同上)
+-   fade到：`$(selector).fadeTo(speed, opacity, callback)`：
+    -   `speed`：fade的速度
+    -   `opacity`：透明度 0-1
+    -   `callback`：回调函数，fade结束后执行的函数
+
+### 自定义动画
+
+-   `$(selector).animate(args)`：
+
+    -   接收三个参数时：为`$(selector).animate(styleObj, speed, callback)`
+
+        -   `styleObj`：样式对象，里面可以定义需要该元素变成的css属性
+        -   `speed`：动画速度，数字或特定字符串
+        -   `callback`：回调函数，动画结束后执行的函数
+
+        **例子**：给目标div设置动画：
+
+        -   将div变成宽500px，有1px黑色实线边框的样式
+        -   动画时长为1s
+        -   动画结束后控制台中打印`“Animation Done.”`
+
+        ```js
+        $("div").animate({
+            width: "500px",
+            border: 1px solid black;
+        }, 1000, ()=>console.log("Animation Done."));
+        ```
+
+    -   接收四个参数时：为`$(selector).animate(styleObj, speed, easing, callback)`
+
+        -   在`speed`参数后面加一个参数`easing`，可以指定动画节奏：
+            -   `“linear”`：匀速动画
+            -   `“swing”`：先慢后快最后慢，$x-t$图像为S型曲线
+
+### 停止/延迟
+
+-   停止动画：`$(selector).stop(stopAll, goToEnd)`
+    -   `stopAll`：（默认是`false`）是否清除动画队列
+    -   `goToEnd`：（默认是`false`）是否继续完成当前动画
+    >   为了防止动画队列出bug，在执行新一轮动画之前，应当先将该DOM元素的动画停止，并继续后续动画，即使用默认值直接`$(selector).stop()`
+
+-   延迟动画：`$(selector).delay(speed)`
+
+
+
+### 设置
+
+-   `$.fx.off`：是否关闭页面所有jQuery动画，默认为`false`
+-   `$.fx.interval`：设置jQuery动画每帧用时，默认为13（毫秒）
