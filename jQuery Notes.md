@@ -105,7 +105,7 @@ $(args);
         $('parent child');
         ```
 
-    -   接收一个html片段，会创建相应的DOM元素
+    -   接收一个html片段，会创建相应的DOM元素，并包裹在jQuery对象中
 
         ```js
         $("<p>This is a paragraph</p>");
@@ -832,3 +832,96 @@ $("div").trigger("click.pers1");
 
 -   `$.fx.off`：是否关闭页面所有jQuery动画，默认为`false`
 -   `$.fx.interval`：设置jQuery动画每帧用时，默认为13（毫秒）
+
+
+
+## jQuery添加节点
+
+### 内部添加
+
+-   `$(selector).append(jquery对象|dom元素)`：在指定元素内部的最后添加元素
+-   `$(selector).prepend(jquery对象|dom元素)`：在指定元素内部的最前面添加元素
+-   `jquery对象.appendTo($(selector))`：将目标元素添加到制定元素内部最后
+-   `jquery对象.prependTo($(selector))`：将目标元素添加到指定元素内部最前面
+
+### 外部添加
+
+-   `$(selector).after(jquery对象|dom元素)`：在指定元素（外部）的后面添加元素
+-   `$(selector).before(jquery对象|dom元素)`：在指定元素（外部）的前面添加元素
+-   `jquery对象.insertAfter($(selector))`：将目标元素添加到指定元素（外部）的后面
+-   `jquery对象.insertBefore($(selector))`：将目标元素添加到指定元素（外部）的前面
+
+
+
+## jQuery删除节点
+
+-   `$(selector).remove(‘cssSelector’) ` / `$(selector).detach('cssSelector')`：删除指定元素
+-   `$(selector).empty()`：删除指定元素内部的内容和子元素
+
+    **例子**
+
+    ```html
+    <ul>
+        <li class="item"></li>
+        <li></li>
+        <li></li>
+        <li></li>
+        <li></li>
+    </ul>
+    ```
+
+    ```js
+    // 删除class为item的li元素
+    $('li').remove('.item');
+    console.log($('ul')[0]);
+    // <ul>
+    //    <li></li>
+    //    <li></li>
+    //    <li></li>
+    //    <li></li>
+    // </ul>
+    
+    // 删除ul中所有的li元素
+    $('ul li').remove();
+    console.log($('ul')[0]);
+    // <ul></ul>
+    
+    // 清空ul中所有的元素
+    $('ul').empty();
+    ```
+
+
+
+## jQuery替换节点
+
+-   `$(selector).repalceWith(jquery对象|dom元素)`：将指定的所有元素替换成其他元素
+-   `$(jquery对象).repalceAll($(selector))`：用某元素替换所有的指定元素
+
+>   `replaceWith`和`replaceAll`一样，只不过二者的替换/被替换的顺序不一样
+
+
+
+## jQuery复制拷贝节点
+
+`$(selector).clone(true|false)`：复制指定元素，并返回克隆后的元素
+
+-   浅拷贝：（不克隆指定元素的事件）`$(selector).clone(false)`
+-   深拷贝：（克隆指定元素的事件）`$(selector).clone(false)`
+
+**例子**
+
+```js
+let div = $('div').clone(false),
+    deepDiv = $('div').clone(true);
+```
+
+
+
+
+
+
+
+
+
+
+
