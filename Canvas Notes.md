@@ -121,7 +121,7 @@ ctx.stroke();
 
 
 
-## 2.4 绘制矩形
+## 2.4 绘制矩形（rect）
 
 ### 2.4.1 描边矩形
 
@@ -164,5 +164,25 @@ ctx.stroke();
     ctx.clearRect(x, y, width, height);
     ```
 
-    
+
+
+## 2.5 绘制圆弧（arc）
+
+-   `ctx.arc(x, y, radius, startAngle, endAngle, counterClockWise)`
+
+    -   `x, y`：（number）圆心坐标
+    -   `radius`：（number）半径
+    -   `startAngle` `endAngle`：起始/结束角度，以弧度为单位，如：
+        -   30°：`startAngle = 30 * Math.PI / 180`
+    -   `counterClockWise`：（boolean）是否是逆时针，默认为``false`
+
+```js
+ctx.moveTo(100, 100);
+ctx.arc(100, 100, 50, 30*Math.PI/180, -30*Math.PI/180, true);
+ctx.closePath();
+ctx.stroke();
+// ctx.fill();
+```
+
+
 
