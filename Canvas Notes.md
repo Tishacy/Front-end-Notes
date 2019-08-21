@@ -1,4 +1,6 @@
 <h1 style="font-size:40px; font-style:italic">Canvas Notes</h1>
+
+
 [TOC]
 
 # 1. canvas简介
@@ -208,4 +210,39 @@ ctx.textAlign = "left";
 ctx.strokeText("This is a stroked text.", 450, 400);
 ctx.fillText("This is a filled text.", 100, 300);
 ```
+
+
+
+## 2.7 绘制图片
+
+-   基本绘制图片的方式：`ctx.drawImage(img, x, y, width, height)`
+
+    -   `img`：图片的dom对象
+    -   `x` `y`：图片的坐标
+
+    -   `width` `height`：(optional) 绘制图片的宽度/高度
+        -   如果指定了宽高，最好成比例，不然图片会被拉伸
+        -   等比公式：$toH = H \times toW / W$
+            -   $toH$ $toW$：设置高、宽
+            -   $H$ $W$：实际高、宽
+
+```js
+let img = new Image();
+img.src = "./images/dom.png"
+// 需要等图片加载后执行canvas绘制图片
+img.onload = function() {
+    ctx.drawImage(img, 0, 0, 400, 200);
+    
+    // 给定宽度，保持宽高比
+    let toW = 400,
+        toH = toW * img.height / img.width;
+    ctx.drawImage(img, 100, 100, toW, toH);
+}
+```
+
+-   图片裁剪：`ctx.drawImage(img, sx, sy, swidth, sheight, x, y, width, height)`
+    -   `img`：图片的dom对象
+    -   `sx` `sy`：裁剪的左上角坐标
+    -   `swidth` `wheight`：裁剪的宽高
+    -   `x` `y` `width` `height`：同图片基本绘制方式中的参数
 
