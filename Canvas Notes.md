@@ -186,3 +186,26 @@ ctx.stroke();
 
 
 
+## 2.6 绘制文字
+
+-   绘制被填充的文本：`ctx.fillText([文本], x, y)`
+
+-   绘制描边（不填充）的文本：`ctx.strokeText([文本], x, y)`
+
+-   返回包含指定文本宽度的对象：`ctx.measureText([文本])`
+
+    ```js
+    ctx.measureText("text").width;
+    // TextMetrics {width: 24.835952758789062}
+    ```
+
+```js
+ctx.moveTo(300, 300);
+ctx.fillStyle = "purple";
+ctx.font = "20px '微软雅黑'";
+ctx.textBaseline = "bottom";
+ctx.textAlign = "left";
+ctx.strokeText("This is a stroked text.", 450, 400);
+ctx.fillText("This is a filled text.", 100, 300);
+```
+
