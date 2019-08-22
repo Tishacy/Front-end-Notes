@@ -248,7 +248,9 @@ img.onload = function() {
 
 
 
-## 2.8 绘制序列帧
+## 3 Canvas练习
+
+## 3.1 绘制序列帧
 
 ```js
 let origin = {
@@ -283,4 +285,113 @@ let frameSequence = function (o){
     }
 }
 ```
+
+
+
+## 绘制坐标系
+
+```js
+/* Figure 绘制图像的类 */
+class Figure {
+    constructor(width, height) {
+        this.canvas = document.createElement('canvas');
+        this.canvas.width = width;
+        this.canvas.height = height;
+        this.ctx = this.canvas.getContext('2d'),
+        this.mainColor = "#000";
+        [this.width, this.height] = [.8*this.canvas.width, .8*this.canvas.height];
+        [this.x0, this.y0] = [.1 * this.canvas.width, .9 * this.canvas.height];
+        [this.arrowWidth, this.arrowHeight] = [3, 10];
+        this.init();
+    }
+    // 绘制坐标系
+    init() {
+        this.ctx.beginPath();
+        this.ctx.strokeStyle = this.mainColor;
+        this.ctx.lineWidth = '1px';
+
+        this.ctx.moveTo(this.x0, this.y0);
+        this.ctx.lineTo(this.x0 + this.width, this.y0);
+        this.ctx.lineTo(this.x0 + this.width - this.arrowHeight, this.y0 - this.arrowWidth);
+        this.ctx.moveTo(this.x0 + this.width, this.y0);
+        this.ctx.lineTo(this.x0 + this.width - this.arrowHeight, this.y0 + this.arrowWidth);
+
+        this.ctx.moveTo(this.x0, this.y0);
+        this.ctx.lineTo(this.x0, this.y0 - this.height);
+        this.ctx.lineTo(this.x0 - this.arrowWidth, this.y0 - this.height + this.arrowHeight);
+        this.ctx.moveTo(this.x0, this.y0 - this.height);
+        this.ctx.lineTo(this.x0 + this.arrowWidth, this.y0 - this.height + this.arrowHeight);
+
+        this.ctx.stroke();
+    }
+    // 显示canvas
+    show() {
+        document.getElementsByTagName('body')[0].appendChild(this.canvas);
+    }
+    // 绘制数据
+    plot(data) {
+        // 绘图设置
+        this.ctx.beginPath();
+        this.xdata = data.x;
+        this.ydata = data.y;
+        this.xlabel = data.xlabel || 'x';
+        this.ylabel = data.ylabel || 'y';
+        this.ctx.strokeStyle = data.color || 'red';
+        this.markerSize = data.markerSize || '5';
+        this.title = data.title || '';
+
+        let xLen = this.xdata.length,
+            maxY = Math.max(...this.ydata),
+            xInterval = this.width / (xLen + 1);
+
+        // 将数据转换为像素坐标
+        this.xcoor = this.xdata.map((x, xdata)=>{
+            return this._transXToCoor(x, xInterval);
+        })
+        this.ycoor = this.ydata.map((y, ydata)=>{
+            return this._transYToCoor(y, maxY);
+        })
+
+        // 绘制曲线
+        this.ctx.moveTo(this.xcoor[0], this.ycoor[0]);
+        this.xcoor.forEach((x, i)=>{
+            this.ctx.lineTo(this.xcoor[i], this.ycoor[i]);
+            this.ctx.fillRect(this.xcoor[i]-.5*this.markerSize, this.ycoor[i]-.5*this.markerSize, this.markerSize, this.markerSize);
+        }) 
+        this.ctx.stroke();
+
+        // 绘制label
+        this.ctx.beginPath();
+        this.ctx.strokeStyle = this.mainColor;
+        let xlabelLen = this.ctx.measureText(this.xlabel).width,
+            ylabelLen = this.ctx.measureText(this.ylabel).width;
+        console.log(xlabelLen, ylabelLen);
+        this.ctx.fillText(this.xlabel, this.x0 + this.width, this.y0 + xlabelLen);
+        this.ctx.fillText(this.ylabel, this.x0 - .5*ylabelLen, this.y0 - this.height - 10);
+        this.ctx.stroke();
+    }
+    _transXToCoor(x, xInterval) {
+        return this.x0 + x * xInterval;
+    }
+    _transYToCoor(y, maxY) {
+        return this.y0 - y / maxY * this.height;
+    }
+}
+```
+
+调用：
+
+```js
+let figure = new Figure(400, 300),
+    data = {
+        'x': [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
+        'y': [1, 10, 3, 6, 7, 4, 5, 2, 8, 9],
+        'xlabel': 'time',
+        'ylabel': 'frequency'
+    };
+figure.plot(data);
+figure.show();
+```
+
+![](./Notes Images/figure.png)
 
