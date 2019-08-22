@@ -246,3 +246,41 @@ img.onload = function() {
     -   `swidth` `wheight`：裁剪的宽高
     -   `x` `y` `width` `height`：同图片基本绘制方式中的参数
 
+
+
+## 2.8 绘制序列帧
+
+```js
+let origin = {
+    // 'imgPath': './images/animation.png',
+    'imgPath': './images/RYU1_wait.gif',
+    // 'imgPath': './images/frame1.jpg',
+    'x': 100,
+    'y': 300,
+    'index': 0,
+    'toW': 100,
+    'numRow': 1,
+    'numCol': 6,
+    'dt': 60
+};
+let timer;
+let frameSequence = function (o){
+    // 对序列帧图片进行设置
+    let img = new Image();
+    img.src = o.imgPath;
+    o.sx = 0,
+    o.sy = o.index * img.height / o.numRow;
+    o.swidth = img.width / o.numCol;
+    o.sheight = img.height / o.numRow; 
+    o.toH = o.toW * o.sheight / o.swidth;
+    img.onload = ()=>{
+        // 绘制序列帧的核心部分
+        timer = setInterval(()=>{
+            ctx.clearRect(o.x, o.y, o.toW, o.toH);
+            ctx.drawImage(img, o.sx, o.sy, o.swidth, o.sheight, o.x, o.y, o.toW, o.toH);
+            o.sx = (o.sx + o.swidth) % img.width;
+        }, o.dt);
+    }
+}
+```
+
