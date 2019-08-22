@@ -1,6 +1,4 @@
 <h1 style="font-size:40px; font-style:italic">Canvas Notes</h1>
-
-
 [TOC]
 
 # 1. canvas简介
@@ -106,6 +104,24 @@ var ctx = canvas.getContext("2d");
 -   填充颜色：`ctx.fillStyle([颜色])`
 -   添加新的绘制路径：`ctx.beginPath()`
     -   新绘画路径中设置的样式只在当前路径中生效
+
+### 2.2.3 绘画环境的保存和恢复
+
+-   绘制环境保存：`ctx.save()`
+    -   将当前的绘制环境保存到缓存中
+-   绘制环境还原：`ctx.restore()`
+    -   返回之前保存过的路径状态和属性，获取最近缓存过的ctx
+
+>   为了不影响其他的绘图环境，在每次绘制图像的前面，应当保存绘制环境，并在结束时还原之前的环境。
+>
+>   ```js
+>   function drawSomething(ctx) {
+>       ctx.save();
+>       // 绘图代码
+>       ctx.restore();
+>   }
+>   drawSomething();
+>   ```
 
 ## 2.3 绘制直线
 
@@ -225,20 +241,29 @@ ctx.fillText("This is a filled text.", 100, 300);
         -   等比公式：$toH = H \times toW / W$
             -   $toH$ $toW$：设置高、宽
             -   $H$ $W$：实际高、宽
+    ```js
+        let img = new Image();
+        img.src = "./images/dom.png"
+        // 需要等图片加载后执行canvas绘制图片
+        img.onload = function() {
+        ctx.drawImage(img, 0, 0, 400, 200);
 
-```js
-let img = new Image();
-img.src = "./images/dom.png"
-// 需要等图片加载后执行canvas绘制图片
-img.onload = function() {
-    ctx.drawImage(img, 0, 0, 400, 200);
+        // 给定宽度，保持宽高比
+        let toW = 400,
+            toH = toW * img.height / img.width;
+        ctx.drawImage(img, 100, 100, toW, toH);
+    }
+    ```
     
-    // 给定宽度，保持宽高比
-    let toW = 400,
-        toH = toW * img.height / img.width;
-    ctx.drawImage(img, 100, 100, toW, toH);
-}
-```
+-   画布渲染画布：将一个画布放进另一个画布中
+
+    ```js
+    let canvas1 = document.querySelector(".canvas1"),
+        canvas2 = document.querySelector(".canvas2"),
+        ctx1 = canvas1.getContext('2d'),
+        ctx2 = canvas2.getContext('2d');
+    ctx2.drawImage(canvas1, 10, 10);
+    ```
 
 -   图片裁剪：`ctx.drawImage(img, sx, sy, swidth, sheight, x, y, width, height)`
     -   `img`：图片的dom对象
@@ -246,9 +271,92 @@ img.onload = function() {
     -   `swidth` `wheight`：裁剪的宽高
     -   `x` `y` `width` `height`：同图片基本绘制方式中的参数
 
+## 2.8 设置阴影
+
+>   一般不用，为了更高的性能，用图片代替
+
+- 设置阴影的颜色：`ctx.shadowColor`
+- 设置阴影的模糊级别：`ctx.shadowBlur`
+    - 设置大于1的正整数，数值越高，模糊程度越大
+- 设置阴影的水平距离：`ctx.shadowOffsetX`
+- 设置阴影的垂直距离：`ctx.shadowOffsetY`
+
+## 2.9 设置线性渐变
+
+>   一般不用，为了更高的性能，用图片代替
+
+-   设置线性渐变：`ctx.createLinearGradient(x0, y0, x1, y1)`
+    -   `x0` `y0`：起始坐标
+    -   `x1` `y1`：结束坐标
+-   添加渐变颜色：`grd.addColorStop(0, “black”)`
+    -   第一个参数为0-1之间的值，表示开始到结束之间的位置
+
+```js
+let grd = ctx.createLinearGradient(0, 0, 170, 0);
+grd.addColorStop(0, "black");
+grd.addColorStop(1, "red");
+ctx.fillStyle = grd;
+ctx.fillRect(0, 0, 100, 100);
+```
+
+## 2.10 设置圆形渐变
+
+>   一般不用，为了更高的性能，用图片代替
+
+-   设置圆形渐变：`ctx.createRadialGr`
+-   `adient(x0, x0, r0, x1, y1, r1)`
+    -   `x0` `y0`：渐变的开始的圆的x y坐标
+    -   `r0`：开始圆的半径
+    -   `x1` `y1`：渐变的结束的圆的x y坐标
+    -   `r1`：结束圆的半径
+
+```js
+let rlg = ctx.createRadialGradient(300, 300, 10, 300, 300, 200);
+rlg.addColorStop(0, 'teal');
+rlg.addColorStop(.4, 'navy');
+rlg.addColorStop(1, 'purple');
+ctx.fillStyle = rlg;
+ctx.fillRect(100, 100, 500, 500);
+```
+
+## 2.11 绘制背景图
+
+>   一般不用，为了更高的性能，用图片代替
+
+-   在指定方向内重复指定的元素：`ctx.createPattern(img, pattern)`
+    -   `img`：背景的图片、画布或者视频元素
+    -   `pattern`：背景平铺的模式
+        -   `repeat`：默认，水平、垂直方向重复
+        -   `repeat-x`：只在水平方向重复
+        -   `repeat-y`：只在垂直方向重复
+        -   `no-repeat`：不重复
+
+```js
+let img = document.getElementById("lamp");
+let pat = ctx.createPattern(img, "repeat");
+ctx.rect(0, 0, 150, 100);
+ctx.fillStyle = pat;
+ctx.fill();
+```
+
+## 2.12 变换
+
+-   缩放：`ctx.scale(scaleWidth, scaleHeight)`
+    -   `scaleWidth` `scaleHeight`：1-100%、5-50%、2-200%
+    -   缩放的是整个画布，缩放后，继续绘制的图形会被放大或缩小
+-   位移画布：`ctx.translate(x, y)`
+    -   重新映射画布上的（0, 0）位置
+    -   `x` `y `：将画布的(0, 0)坐标更新到新的x, y
+-   旋转：`ctx.rotate(angle)`
+    -   `angle`：围绕画布的（0, 0）点顺时针旋转的角度（注意是弧度）
+-   设置环境的透明度：`ctx.globalAlpha = alpha`
+    -   `alpha`介于0-1，0为完全透明，1位不透明
 
 
-## 3 Canvas练习
+
+
+
+# 3 Canvas练习
 
 ## 3.1 绘制序列帧
 
@@ -273,7 +381,7 @@ let frameSequence = function (o){
     o.sx = 0,
     o.sy = o.index * img.height / o.numRow;
     o.swidth = img.width / o.numCol;
-    o.sheight = img.height / o.numRow; 
+    o.sheight = img.height / o.numRow;
     o.toH = o.toW * o.sheight / o.swidth;
     img.onload = ()=>{
         // 绘制序列帧的核心部分
@@ -288,7 +396,7 @@ let frameSequence = function (o){
 
 
 
-## 绘制坐标系
+##  3.2 绘制坐标系
 
 ```js
 /* Figure 绘制图像的类 */
