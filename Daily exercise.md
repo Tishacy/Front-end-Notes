@@ -994,6 +994,8 @@
     </p>
     </details>
 
+---
+
 25. 下面代码输出结果是什么
     ```js
     var a = false;
@@ -1031,3 +1033,56 @@
     ```
     </p>
     </details>
+---
+
+26. 下面代码执行结果是什么？
+    ```js
+    var user = "abc";
+    function changeUser() {
+        user = "qwe";
+        return;
+        function user() {
+            console.log("user Func");
+        }
+    }
+    changeUser();
+    console.log(user);
+    ```
+    <details>
+    <summary>答案</summary>
+    <p>
+
+    执行结果:  `"abc"`
+
+    知识点：函数预编译
+
+    解析：
+
+    1. 在`changeUser()`执行之前，进行`changeUser`函数的预编译：
+
+        1. 生成函数的AO对象（执行期上下文）：
+            ```js
+            AO = {} 
+            ```
+        2. 将函数中形参、声明的变量放入`AO`对象中，并赋值为`undefined`。此处没有声明的变量。
+        3. 将形参中的值替换为实参值（形参实参相统一）。此处没有形参。
+        4. 将声明的函数放入`AO`对象中，并赋值为函数体。此时，`AO`对象为：
+            ```js
+            AO = {
+                user: function () {console.log("user Func")}
+            }
+           ```
+    2. 预编译结束后，函数逐行执行。执行到`user = "qwe"`时，`AO`对象为：
+        ```js
+        AO = {
+            user: "qwe"
+        }
+        ```
+        然后`return ;`，函数执行结束，`AO`对象销毁。
+        > 注意：此时修改的`user`是`changeUser`函数对应`AO`对象中的`user`，而全局`GO`的`user`并没有发生改变。
+    3. 然后，执行`console.log(user)`，即打印出全局`GO`的`user`，依然是`"abc"`。
+    </p>
+    </details>
+ 
+ ---
+
