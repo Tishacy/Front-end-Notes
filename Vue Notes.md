@@ -41,10 +41,10 @@ Vue：一套用于构建用户界面的渐进式框架
 
 ## 插值表达式
 
-- 可以在标签中执行js代码的表达式
+- 可以在标签内部执行js代码的表达式
 
     ```html
-    <div id="app">{{ [js代码] }}</div>
+    <div id="app">{{ /* js代码 */] }}</div>
     <script>
     	new Vue({
             el: 'div#app'
@@ -331,7 +331,7 @@ vm.$mount("div.demo");
 
 ## 条件渲染
 
-### `v-if` `v-else-if` `v-else` `v-show`
+### `v-if`
 
 -   `v-if`能够控制元素的显示与隐藏
 
@@ -347,6 +347,10 @@ vm.$mount("div.demo");
         },
     })
     ```
+
+
+
+###  `v-else-if` `v-else`
 
 -   `v-else-if` `v-else`需要配合`v-if`来使用，并且之间不能有其他不含该指令的标签
 
@@ -388,6 +392,10 @@ vm.$mount("div.demo");
     })
     ```
 
+
+
+### `v-show`
+
 - `v-show`：也能够控制元素的显示与隐藏
   
     ```html
@@ -404,7 +412,7 @@ vm.$mount("div.demo");
 	```
 
 - `v-show`与`v-if`的区别在于：
-    
+  
     -   `v-if`是通过**删除和添加dom元素**来实现元素的显示与隐藏，`v-show`是通过**添加行间样式**`display:none`来实现元素的显示与隐藏
     -   由于频繁操作dom会造成性能浪费，因此:
 	        -   当需要某元素频繁地显示与隐藏时，最好是通过`v-show`来实现

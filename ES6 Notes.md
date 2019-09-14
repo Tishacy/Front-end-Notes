@@ -884,9 +884,14 @@ new Vue({
 ## 语法
 
 ```js
-let promise = new Promise(function (resolve, reject){
+const promise = new Promise(function (resolve, reject){
     // resolve	成功时调用
     // reject	失败时调用
+    if (/* 条件 */) {
+        resolve("Success!");
+    } else {
+        reject("Failed!");
+    }
 });
 promise.then(res=>{
     console.log(res);
@@ -897,15 +902,90 @@ promise.then(res=>{
 
 常用方法：
 
-```js
-new Promise().then(res=>{/* ... */}).catch(err=>{/* ... */});
-```
+- 一般用法：  
+    ```js
+    new Promise().then(res=>{/* ... */}).catch(err=>{/* ... */});
+    ```
+    
+- `Promise.resolve('aa’)`：将现有的东西，转成一个promise对象，并且是resolve的状态
+
+    - 等价于：
+
+        ```js
+        new Promise(resolve => {
+            resolve('aa');
+        });
+        ```
+
+-   `Promise.reject(‘aaa’)`：将现有的东西，转成一个promise对象，并且是reject的状态
+
+    -   等价于：
+
+        ```js
+        new Promise((resolve, reject) => {
+            reject('aaa');
+        });
+        ```
+
+-   `Promise.all([p1, p2, p3])`：将promise对象放一个数组中，转成一个promise对象，数组中的promise对象全都是resolve状态（成功）时才执行`then`。
+
+    -   `Promse.all`在处理多个异步处理时非常有用，比如说一个页面上需要等两个或多个ajax的数据回来以后才正常显示，在此之前只显示loading图标。
+
+    -   `Promise.all`获得的成功结果的数组里面的数据顺序，和`Promise.all`接收到的数组顺序是一致的，即`p1`的结果在前，即便`p1`的结果获取的比`p2`要晚。这带来了一个绝大的好处：在前端开发请求数据的过程中，偶尔会遇到发送多个请求并根据请求顺序获取和使用数据的场景，使用`Promise.all`毫无疑问可以解决这个问题。
+
+    -   例子：
+
+        ```js
+        let p1 = Promise.resolve('aaa');
+        let p2 = Promise.resolve('bbb');
+        let p3 = Promise.resolve('ccc');
+        
+        Promise.all([p1, p2, p3]).then(res => {
+            // p1 p2 p3全都异步执行得到结果后所执行的函数
+        	let [res1, res2, res3] = res;
+            console.log(res1, res2, res3);
+            // 'aaa' 'bbb' 'ccc'
+        })
+        ```
+
+-   `Promise.race([p1, p2, p3])`：将promise对象放一个数组中，转成一个promise对象，数组中的promise对象哪一个结果返回得快，就返回那个结果，不管结果本身是成功状态还是失败状态。
+
+    -   例子：
+
+        ```js
+        let p1 = new Promise((resolve, reject) => {
+            setTimeout(() => {
+                resolve("SUCCESS");
+            }, 1000);
+        })
+        let p2 = new Promise((resolve, reject) => {
+            setTimeout(() => {
+                reject("FAILED");
+            }, 500);
+        })
+        
+        Promise.race([p1, p2]).then((res) => {
+            console.log(res);
+        }).catch((err) => {
+            console.log(err);	// 'FAILED'
+        })
+        ```
+
+        
 
 
 
 # 模块化
 
 注意：需要放到服务器环境。
+
+## 模块化历史
+
+-   在ES6之前，社区制订一套模块规范：
+    -   Commenjs：主要是服务器端，比如Node.js通过`require(‘http’)`来引入模块
+    -   AMD：主要是客户端，比如requireJs, curlJs
+    -   CMD：主要是客户端，比如seaJs
+-   ES6出来后，统一了服务端和客户端模块规范
 
 ## 基本用法
 
@@ -920,18 +1000,19 @@ new Promise().then(res=>{/* ... */}).catch(err=>{/* ... */});
           z = 3;
     export {x, y, z};
     
-    export default d = 5;
+    const d = 5;
+    export default d;
     ```
 
 -  如何使用模块
 
     ```html
     <script type="module">
-        import './module.js';	// 相当于引入文件  
-        import {a} from './module.js';
-        import {x as xx, y as yy, z as zz} from './module.js';
-        import d from './module.js'
-        import * as mod from './module.js'
+        import './module.js';	             // 相当于直接引入（执行）模块文件
+        import {a} from './module.js';	     // 需要在模块文件中 export {a};
+        import {x as xx, y  as yy, z as zz} from './module.js';  // 需要在模块文件中 export {x, y, z};
+        import d from './module.js';         // 需要在模块文件中 export default d;
+        import * as mod from './module.js';  // 需要在模块文件中 export 需要挂在 mod对象中的变量和函数
         
         console.log(a);				// 123
         console.log(xx, yy, zz);	// 1 2 3
@@ -1085,6 +1166,8 @@ stu.showSkill();	// Skill is study
 -   使用`class Son extends Parent`来实现继承
 -   其中子类的构造函数`constructor`中必须使用`super()`来将父级的属性和方法继承过来
 -   在子类中调用父类的方法时，使用`super.parentMethod()`来实现
+
+
 
 
 
