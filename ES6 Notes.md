@@ -1218,7 +1218,7 @@ stu.showSkill();	// Skill is study
 -   语法：
 
     -   在异步函数外加上关键字`async`，并在函数内部配合关键字`await`来使用
-        
+      
         -   `async`函数内部凡是对`promise`对象的操作均需要配合`await`来得到该`promise`对象所`resolve`的结果
     -   示例：
         ```js
@@ -1241,5 +1241,85 @@ stu.showSkill();	// Skill is study
     -  `async`函数返回的是一个`promise`对象
     -  由于大部分`await`后面的东西都不能保证成功resolve，因此建议凡是需要使用`await`的地方都用`try…catch...`包装起来
 
--  
 
+
+# 新增数据结构
+
+## `Set`
+
+-   类似数组，但是不允许有重复值
+-   用法：
+
+    -   创建：`let set = new Set(['a', 'b'])`
+    -   添加：`set.add(item)`
+    -   删除：`set.delete(item)`
+    -   判断是否存在某值：`set.has(item)`
+    -   清空：`set.clear()`
+    -   set中值的个数：`set.size`
+    -   遍历：
+        -   `for (let item of set) {}`
+        -   `set.forEach((val, index) => {})`
+
+-   常用来做数组去重：
+
+    ```js
+    let arr = [9,8,4,3,7,6,5,4,3,2,1,4,4,5,4,5,6,3];
+    let newArr = [...new Set(arr)];
+    console.log(newArr);
+    // [9, 8, 4, 3, 7, 6, 5, 2, 1]
+    ```
+
+## `Map`
+
+-   类似json，但是json的key只能是字符串，map的key可以是任意类型
+
+-   用法：
+
+    -   创建：`let map = new Map()`
+    -   添加：`map.set(key, value)`
+    -   获取：`map.get(key)`
+    -   删除：`map.delete(key)`
+    -   判断是否存在某项：`map.has(key)`
+    -   清空：`map.clear()`
+    -   map中的项数：`map.size`
+    -   遍历：
+        -   `for (let [key, value] of map) {}`
+        -   `map.forEach((val, index) => {})`
+
+-   示例：
+
+    ```js
+    const arr = [1,2,3,4];
+    const json = {'a': 123, 'b': 234};
+    
+    // 创建Map
+    const map = new Map();
+    
+    // 添加
+    map.set(arr, 'This is an array');
+    map.set(json, 'This is a json');
+    console.log(map);
+    // Map(2) {Array(4) => "This is an array", {…} => "This is a json"}
+    
+    // 获取
+    const jsonData = map.get(json);
+    console.log(jsonData);
+    // "This is a json"
+    
+    // 判断某项是否存在
+    console.log(map.has(arr));
+    // true
+    
+    // map中的项数
+    console.log(map.size);
+    // 2
+    
+    // 遍历map
+    map.forEach((val, index) => {
+        console.log(index, val);
+    })
+    // (4) [1, 2, 3, 4] "This is an array"
+    // {a: 123, b: 234} "This is a json"
+    ```
+
+    
