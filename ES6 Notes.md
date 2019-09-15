@@ -1211,4 +1211,35 @@ stu.showSkill();	// Skill is study
     // ["Hello", "This is a generaotr", "Done!"]
     ```
 
-    
+
+
+# `Async/await`
+
+-   语法：
+
+    -   在异步函数外加上关键字`async`，并在函数内部配合关键字`await`来使用
+        
+        -   `async`函数内部凡是对`promise`对象的操作均需要配合`await`来得到该`promise`对象所`resolve`的结果
+    -   示例：
+        ```js
+        async function getData(url) {
+            try {
+                const response = await fetch(url);
+                const jsonData = await response.json();
+                return jsonData;	      // 相当于promsie对象中的 resolve(jsonData)        
+            } catch(err) {
+                throw new Error("出错了"); // 相当于promise对象中的 reject("出错了")   
+            }
+        }
+        getData('<api url>').then(data => console.log(data),
+                                  err => console.log(err));
+        ```
+-  特点：
+    -  `await`只能放到`async`函数中
+    -  `await`后面可以是`promise`对象，也可以是数字、字符串、布尔值等
+    -  只要`await`语句后面`promise`状态变成reject，那么整个`async`函数就会中断执行
+    -  `async`函数返回的是一个`promise`对象
+    -  由于大部分`await`后面的东西都不能保证成功resolve，因此建议凡是需要使用`await`的地方都用`try…catch...`包装起来
+
+-  
+
