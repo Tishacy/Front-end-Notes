@@ -1171,3 +1171,44 @@ stu.showSkill();	// Skill is study
 
 
 
+# Generator
+
+-   generator函数：为了解决异步问题
+
+-   语法：
+
+    ```js
+    function * gen() {
+        yield "Hello";
+        yield "This is a generator";
+        yield "Done!";
+        return "return的东西打印不出来"
+    }
+    let gt = gen();
+    // generator函数返回的是一个generator对象
+    
+    // 依次获取返回值
+    console.log(gt.next());
+    // {"value": "Hello", "done": false}
+    
+    // 遍历生成器
+    for (let val of gt) {
+        console.log(val);
+    }
+    // Hello
+    // This is a generator
+    // Done!
+    
+    // 解构赋值
+    let [a, b, c] = gen();
+    let [d, ...e] = gen();
+    let genArr = [...gen()];
+    console.log(a, b, c);
+    // Hello This is a generator Done!
+    console.log(d, e);
+    // Hello ["This is a generator", "Done!"]
+    console.log(genArr);
+    // ["Hello", "This is a generaotr", "Done!"]
+    ```
+
+    
