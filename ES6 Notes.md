@@ -1356,4 +1356,107 @@ stu.showSkill();	// Skill is study
     // {'w': 'welcome'}
     ```
 
-    
+
+
+# Proxy
+
+-   proxy是设计模式的一种，代理模式
+
+-   语法：
+
+    ```js
+    let obj = new Proxy(target, handler);
+    ```
+
+    -   `target`：被代理的对象
+
+    -   `handler`：一个json，里面包含对代理对象做什么操作
+
+        ```js
+        // handler
+        {
+            set(target, property, value) {},
+            get(target, property) {},
+            deleteProperty(target, property) {},
+            has(target, property) {},
+            apply(target, context, args) {},
+            ...
+        }
+        ```
+
+-   示例：
+
+    -   访问一个对象的属性，默认不存在的时候返回undefined，实现属性不存在时返回警告信息
+        ```js
+        const obj = {
+            name: "tishacy"
+        }
+
+        let newObj = new Proxy(obj, {
+            get(target, property) {
+                if (!(property in target)) {
+                    console.warn(`Attribute '${property}' not found in the given object.`);
+                }
+                return target[property];
+            }
+        })
+        console.log(newObj.name);
+        console.log(newObj.age);
+        ```
+
+    -   实现通过属性来创建div
+
+        ```js
+    const DOM = new Proxy({}, {
+            // 访问DOM属性的时候，触发该函数
+            get(target, property) {
+                // property是 DOM.xxx 里面的 xxx
+                return function(attr={}, ...children) {
+                    const el = document.createElement(property);
+                    // 添加属性
+                    for (let key in attr) {
+                        el.setAttribute(key, attr[key]);
+                    }
+                    // 添加子元素
+                    for (let child of children) {
+                        if (typeof child == 'string') {
+                            child = document.createTextNode(child);
+                        }
+                        el.appendChild(child);
+                    }
+                    return el;
+                }
+            },
+            // 给DOM属性赋值时，触发该函数
+            set(target, property, value) {
+                target[property] = value;
+                return target;
+            }
+        });
+        let oDiv = DOM.div(
+        	{id: 'div1', 'class': 'aaa'},
+            'This is a div',
+            DOM.a({'href': 'https://www.baidu.com'}, 'This is a link'),
+            DOM.ul({},
+               DOM.li({}, '1111'),
+        	   DOM.li({}, '2222'),
+               DOM.li({}, '3333'),
+               DOM.li({}, '4444')
+            )
+        )
+        console.log(oDiv);
+        // <div id="div1" class="aaa">
+        // 		"This is a div"
+        // 		<a href="https://www.baidu.com">This is a link</a>
+        // 		<ul>
+        // 			<li>1111</li>
+        //			<li>2222</li>
+        //			<li>3333</li>
+        //			<li>4444</li>
+        // 		</ul>
+        // </div>
+        
+        oDiv.id = 'div2';
+        console.log(oDiv);
+        // <div id="div2" class="aaa">...</div>
+        ```
