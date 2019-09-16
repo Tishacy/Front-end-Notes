@@ -1323,3 +1323,37 @@ stu.showSkill();	// Skill is study
     ```
 
     
+
+# ES2018 (ES9)
+
+## 命名捕获
+
+-   语法：`?<变量名>`，配合正则用
+
+-   示例：
+
+    ```js
+    const dateStr = '2018-03-20';
+    const reg = /(?<year>\d{4})-(?<month>\d{2})-(?<day>\d{2})/;
+    console.log(dateStr.match(reg));
+    // ["2018-03-20", "2018", "03", "20", index: 0, input: "2018-03-20", groups: {…}]
+    
+    const {year, month, day} = dateStr.match(reg).groups;
+    console.log(year, month, day);
+    // 2018 03 20
+    ```
+
+## 反向引用命名捕获
+
+-   语法：`\k<变量名>`，配合命名捕获和正则用
+
+-   示例：
+
+    ```js
+    const str = 'welcome-welcome';
+    const reg = /^(?<w>welcome)-\k<w>$/;
+    console.log(str.match(reg).groups);
+    // {'w': 'welcome'}
+    ```
+
+    
