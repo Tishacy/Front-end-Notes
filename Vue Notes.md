@@ -458,8 +458,7 @@ vm.$mount("div.demo");
         <li v-for="(val, key) in obj">{{ key }} - {{ val }}</li>
         <li v-for="(val, key, index) in obj">{{ index }} - {{ key }} - {{ val }}</li>
     	<!-- 循环数字 -->
-        <!-- 数字1-10 -->
-        <li v-for="num in 10">{{ num }}</li>
+        <li v-for="num in 10">{{ num }}</li> <!-- 数字1-10 -->
         <li v-for="(num, index) in 10">{{ index }} - {{ num }}</li>
         <!-- 循环字符串 -->
         <li v-for="c in 'tishacy'">{{ c }}</li>
@@ -481,4 +480,113 @@ vm.$mount("div.demo");
     })
     ```
 
--   
+
+
+### 渲染数组的注意点
+
+-   **不能通过索引的方式去更改数组**，这样不会渲染页面。比如：
+
+    ```html
+    <div id="app">
+        <ul>
+            <li v-for="item in arr">{{ item }}</li>
+        </ul>
+        <button @click="handleClick">增加一项</button>
+    </div>
+    ```
+
+    ```js
+    const vm = new Vue({
+        el: '#app',
+    	data: {
+            arr: ['html', 'css', 'js'],
+        },
+        methods: {
+            handleClick () {
+        		// 通过索引的方式来更改数组
+                const length = this.arr.length;
+                this.arr[length] = "ts";
+                this.arr[0] = "HTML";
+            }
+        }
+    })
+    ```
+
+    -   此时，点击`button`后，`vm.arr`确实变成了四项：
+
+        ```js
+        console.log(vm.arr);
+        // ['HTML', 'css', 'js', 'ts']
+        ```
+
+        但是，页面中并没有重新渲染，而是依然是`html, css, js`3项内容。
+
+-   **不能通过更改数组长度的方式来更改数组**，这样不会渲染页面。
+
+    - 比如，将上面`vm.methods.handleClick`函数改为下面这样，依然无法渲染页面
+
+        ```js
+        handleClick () {
+        	// 通过更改数组长度来更改数组
+            this.legnth = 2;
+        }
+        ```
+
+        此时，点击`button`后，`vm.arr`确实只变成了2项：
+
+        ```js
+        console.log(vm.arr);
+        // ['html', 'css']
+        ```
+
+        但是，页面中并没有重新渲染，而是依然是`html, css, js`3项内容。
+
+-   **只能通过使用数组的方法来对数组进行操作**，这样才会渲染页面。
+
+    -   比如，将上面`vm.methods.handleClick`函数改为下面这样，就可以同步渲染页面了。
+
+        ```js
+        handleClick () {
+            this.arr.push('ts');
+            this.arr.splice(0, 1, 'HTML');
+        }
+        ```
+
+-   原因：
+
+    -   在Vue的内部，将数组的一些操作函数都重写了，只要调用数组中的这些函数，就会执行一个渲染页面的函数。
+    -   这些被重写的数组函数称为：数组变异方法
+    -   数组变异方法包括：
+        -   `push` `pop` `shift` `unshift` `splice` `sort` `reverse`
+
+
+
+### 渲染对象的注意点
+
+- **向对象内添加或删除属性，不会渲染页面。**比如：
+
+    ```js
+    // 给vm.obj添加新属性
+    vm.obj.newAttr = "newAttrValue";
+    // 删除vm.obj中的属性
+    delete vm.obj.name;
+    // 都不会渲染页面
+    ```
+
+- **为了给对象内添加新属性，可以使用vue内部提供的`$set`方法**：
+
+    ```js
+    vm.$set(obj, key, value);
+    /**
+     * @param {object|string|number} obj 操作的对象
+     * @param {string|number} key 设置的属性的key
+     * @param {string|number|object} value 设置的属性的value
+     */
+    ```
+
+    比如：`vm.$set(this.obj, ’newAttr’, ’newAttrValue’)`
+
+    - `vm.$set`方法不只适用于对象，数组、字符串、数字等等也可以用，只不过由于字符串、数组直接赋值更改就可以渲染页面，数组通过数组变异函数也可以渲染页面，而对象只能通过`vm.$set`方法来添加属性，因此`vm.$set`方法在对象中更常用一些。
+
+
+
