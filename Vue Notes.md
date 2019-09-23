@@ -112,15 +112,20 @@ Vue：一套用于构建用户界面的渐进式框架
 ```js
 /* JS部分 */
 let vm = new Vue({
-  el: "div#app",    // vue挂载的dom对象
-  data: {a: 1}		// vue对象中的数据
+    el: "div#app",      // vue挂载的dom对象
+    data: {a: 1},		// vue对象中的数据
+    methods: {          // vue对象中的方法
+		sayHi () {
+            console.log("Hello Vue!");
+        };
+    }
 })
 ```
 
 ### 获取vue对象中的属性和方法
 
 -   传入的`data`中的变量，可以使用`vm.[变量名]`来访问、修改
--   Vue对象总的原有属性和方法，可以使用`vm.$[变量名|方法名]`来访问、修改
+-   Vue对象中的原有属性和方法，可以使用`vm.$[变量名|方法名]`来访问、修改
 
 ```js
 // 接上段代码
@@ -327,7 +332,25 @@ vm.$mount("div.demo");
     <div id="app" @click="handleClick"></div>
     ```
 
-    
+-   `v-on`中的事件函数可以传参，比如：
+
+    ```html
+    <div id="app" @click="addAge(5)"></div>
+    ```
+
+    ```js
+    let vm = new Vue({
+        el: '#app',
+        data: {
+            age: 18
+        },
+        methods: {
+            addAge (num) {
+        		this.age += num;
+            }
+        }
+    })
+    ```
 
 ## 条件渲染
 
@@ -413,9 +436,49 @@ vm.$mount("div.demo");
 
 - `v-show`与`v-if`的区别在于：
   
-    -   `v-if`是通过**删除和添加dom元素**来实现元素的显示与隐藏，`v-show`是通过**添加行间样式**`display:none`来实现元素的显示与隐藏
-    -   由于频繁操作dom会造成性能浪费，因此:
-	        -   当需要某元素频繁地显示与隐藏时，最好是通过`v-show`来实现
-	        -   当只需要判断一次某元素是否要显示与隐藏，以后都不改变的时候，比如一开始打开页面决定某些元素是否要显示时，要使用`v-if`
+    -   `v-if`是通过**删除和添加dom元素**来实现元素的显示与隐藏，`v-show`是通过**添加行间样式**`display:none`来实现元素的显示与隐藏。由于频繁操作dom会造成性能浪费，因此:
+        -   当需要某元素频繁地显示与隐藏时，最好是通过`v-show`来实现
+	          -   当只需要判断一次某元素是否要显示与隐藏，以后都不改变的时候，比如一开始打开页面决定某些元素是否要显示时，要使用`v-if`
 	-   `template`虚拟dom元素上不能添加`v-show`
 	    -   原因：虚拟dom元素最终并不真的添加在页面当中，而`v-show`是通过控制行间样式中的`display: none`来控制显示与隐藏，因此控制`template`的`display`属性并不对其包裹的dom元素产生影响
+
+## 列表渲染
+
+### `v-for`
+
+-   循环数组/对象：
+
+    ```vue
+    <ul>
+    	<!-- 循环数组 -->    
+        <li v-for="item in arr">{{ item }}</li>
+        <li v-for="(item, index) in arr">{{ index }} - {{ item }}</li>
+        <!-- 循环对象 -->
+        <li v-for="val in obj">{{ val }}</li>
+        <li v-for="(val, key) in obj">{{ key }} - {{ val }}</li>
+        <li v-for="(val, key, index) in obj">{{ index }} - {{ key }} - {{ val }}</li>
+    	<!-- 循环数字 -->
+        <!-- 数字1-10 -->
+        <li v-for="num in 10">{{ num }}</li>
+        <li v-for="(num, index) in 10">{{ index }} - {{ num }}</li>
+        <!-- 循环字符串 -->
+        <li v-for="c in 'tishacy'">{{ c }}</li>
+        <li v-for="(c, index) in 'tishacy'">{{ index }} - {{ c }}</li>   
+    </ul>
+    ```
+
+    ```js
+    const vm = new Vue({
+        el: 'ul',
+        data: {
+            arr: ['html', 'css', 'js', 'ts'],
+            obj: {
+                name: 'tishacy',
+                age: 18,
+                gender: 'male'
+            }
+        }
+    })
+    ```
+
+-   
