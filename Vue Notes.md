@@ -677,3 +677,61 @@ vm.$mount("div.demo");
             })
             ```
 
+## 侦听器和计算属性
+
+-   侦听器`watch`
+
+    ```js
+    const vm = new Vue({
+    	el: '#app',
+        data: {
+    		name: "tishacy"
+        },
+        watch: {
+            name () {
+                // 当 this.name 的值改变时，就会执行该函数
+            }
+        }
+    })
+    ```
+    
+-   计算属性`computed`
+
+    ```html
+    <div id="#app">
+        <!-- 与正常属性一样取用计算属性 -->
+    	{{ desc }}
+    </div>
+    ```
+
+    ```js
+    const vm = new Vue({
+        el: '#app',
+        data: {
+            name: 'tishacy',
+            age: 18
+        },
+        computed: {
+            desc () {
+                // 只有当该函数所涉及到的数据改变的时候，才去执行
+                return `My name is ${name}, age is ${age}`;
+            }
+        }
+    })
+    ```
+    
+-   `data` `methods` `computed`查找顺序：
+    `data` > `methods` > `computed`
+    
+    - 当需要写逻辑的时候，或者需要写封装函数的函数的时候，写在`methods`里面
+    - 当需要返回一个计算后的值的时候，写在`computed`里面
+    - 当在一个属性改变时需要做一些事情的时候，写在`watch`里面
+    
+- 
+
+
+
+
+
+
+
