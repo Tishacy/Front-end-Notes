@@ -590,3 +590,90 @@ vm.$mount("div.demo");
 
 
 
+## 双向数据绑定
+
+-   `v-model`：实现数据的双向绑定
+
+    -   不使用`v-model`的双向数据绑定：
+
+        ```html
+        <div id="app">
+        	<input type="text" :value="value" @input="handleInput">
+            <span>{{ value }}</span>
+        </div>
+        ```
+
+        ```js
+        const vm = new Vue({
+            el: '#app',
+            data: {
+                value: "tishacy"
+            },
+            methods: {
+                handleInput (e) {
+                    this.value = e.target.value;
+                }
+            }
+        })
+        ```
+
+    -   使用`v-model`的双向数据绑定
+
+        -   `v-model`是input/textarea标签`:value@input`的语法糖
+
+            ```html
+            <div id="app">
+                <!-- input:text标签 双向绑定数据 => value -->
+            	<input type="text" v-model="value"> {{ value }} <br>
+                <!-- textarea标签 双向绑定数据 => content -->
+                <textarea v-model="content"></textarea> {{ content }} <br>
+                <!-- input:checkbox 双向绑定数据 => checked -->
+                <input type="checkbox" v-model="checked"> {{ checked }} <br>
+                <!-- input多个复选框 双向绑定数据 => checkedList-->
+                <label for="html">html</label>
+                <input type="checkbox" value="html" id="html" v-model="checkedList">
+                <label for="js">js</label>
+                <input type="checkbox" value="js" id="js" v-model="checkedList">
+                <label for="vue">vue</label>
+                <input type="checkbox" value="vue" id="vue" v-model="checkedList">
+                <div>{{ checkedList }}</div>
+                <!-- input多个单选项 双向绑定数据 => picked -->
+                <label for="html">html</label>
+                <input type="radio" value="html" id="html" v-model="picked">
+                <label for="js">js</label>
+                <input type="radio" value="js" id="js" v-model="picked">
+                <label for="vue">vue</label>
+                <input type="radio" value="vue" id="vue" v-model="picked">
+                <div>{{ picked }} </div>
+                <!-- select下拉框 -->
+                <select v-model="selected" value="selected">
+                    <option>请选择</option>
+                    <option value="html">html</option>
+                    <option value="js">js</option>
+                    <option value="vue">vue</option>
+                </select>
+                <div>{{ selected }}</div>
+                <!-- select多选框 -->
+                <select v-model="selectedList" value="selectedList" multiple>
+                    <option value="html">html</option>
+                    <option value="js">js</option>
+                    <option value="vue">vue</option>
+                </select>
+                <div>{{ selectedList }}</div>
+            </div>
+            ```
+
+            ```js
+            const vm = new Vue({
+                el: '#app',
+                data: {
+                    value: 'tishacy',
+                    content: 'This is a paragraph',
+                    checked: true,
+                    checkedList: [],
+                    picked: '',
+                    selected: ''
+                }
+            })
+            ```
+
