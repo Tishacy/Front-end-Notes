@@ -726,8 +726,166 @@ vm.$mount("div.demo");
     - 当需要写逻辑的时候，或者需要写封装函数的函数的时候，写在`methods`里面
     - 当需要返回一个计算后的值的时候，写在`computed`里面
     - 当在一个属性改变时需要做一些事情的时候，写在`watch`里面
+
+# Vue组件
+
+-   vue的组件分为两部分：全局组件 和 局部组件
+
+##全局组件
+
+-   全局组件：使用`Vue.component`单独构建的组件
+
+    ```js
+    Vue.component('helloWorld', {
+        template: `
+    		<div>
+    			<button @click="handleClick">click</button>
+    			<span>{{ msg }}</span>
+    		</div>`,
+        data () {
+            return {
+                msg: 'hello vue component!'
+            }
+        },
+        methods: {
+            handleClick () {
+                this.msg = 'Hello Vue Component!'
+            }
+        }
+    })
+    ```
+
+    ```html
+    <hello-world></hello-world>
+    ```
+
+    - 注意：
+        - 注册全局组件的代码要写在实例化Vue对象之前。
+        - 注册组件的名字可以有三种格式：
+            - 小驼峰式：`”helloWorld“`
+            - 大驼峰式：`"HelloWorld"`
+            - 中划线式：`"hello-world"`
+        - 无论注册组件使用哪种方式的名字，在html中使用组件必须使用中划线式：`<hello-world></hello-world>`
+
+## 局部组件
+
+-   局部组件：在`Vue`对象实例内部定义的组件，局部组件优先度更高。
+
+    ```js
+    const vm = new Vue({
+        el: '#app',
+        data: {},
+        components: {
+            'hello': {
+                template: "<div>Hello</div>"
+            }
+        }
+    })
+    ```
     
-- 
+    -   注意：
+    -   注册组件的名字格式以及使用组件的格式与vue局部组件相同
+
+## 父组件与子组件的数据传递
+
+-   父组件向子组件数据传递：
+
+    -   需要三步：
+        -   （定义父组件需要传的数据）Vue对象实例的`data`中定义需要传递的数据，比如下面的示例中的`title` `content`
+        -   （定义子组件需要接收的数据）Vue对象实例中的components中的所定义的组件中需要有`props`属性，有两种格式：
+            -   数组形式：包含字符串形式的传递的数据变量名，如示例中的`[“title”, “content”]`
+            -   对象形式：包含对象形式的传递的数据，所传递的数据变量名作为key，value仍为一个对象，规定该数据的一些属性，比如类型、默认值、校验函数等，见示例。
+        -   （传递数据）在html中使用组件的时候要以`:数据变量名="数据变量名"`绑定所传递的数据，如示例中的`:title=“title” :content=“content”`。
+        -   如果要将data中的一个对象中的全部属性传递给子组件，那么可以使用`v-bind=‘需要传递的对象’`，见示例。
+    
+-   子组件向父组件的数据传递：
+
+    -   需要两步
+        -   子组件中的`methods`中的事件函数触发时，在事件函数内部调用`this.$emit(‘触发事件函数名’, 需要传递的数据)`。
+        -   父组件中的`methods`中添加相应的触发事件函数，就可以接收到子组件传递的数据
+
+-   示例：
+
+    ```js
+    const vm = new Vue({
+        el: "#app",
+        data: {
+            /* 定义父组件需要传的数据 */
+            title: 'This is a title',
+            content: 'This is the component',
+            info: {
+            	name: 'tishacy',
+        		age: 18,
+       		}
+        },
+        methods: {
+            // 接收子组件的数据
+            sonToParent (sonAge) {
+                this.info.age = sonAge;
+            }
+        }
+        components: {
+            'hello': {
+                /* 定义子组件需要接受的数据 */
+                // 数组形式的props属性
+                // props: ["title", "content"],
+                // 对象形式的props属性
+                props: {
+                    title: {
+                        type: String,
+                        default: 'TITLE',
+                        validator (val) {
+                            /** 校验函数，返回一个布尔值
+                             * @param {string} val 传递的‘title’数据
+                             * @returns {boolean} 
+                             * 		true 校验成功，将数据传递给当前组件并渲染
+                             *		false 校验失败，报错提醒，但是仍然将数据传递给当前组件并渲染
+                             */
+                            return val.length > 5
+                        }
+                    },
+                    content: {
+                        type: String,
+                        required: true,
+                    },
+                    name: {
+                        type: String,
+                    },
+                    age: {
+                        type: Number,
+                    }
+                },
+                data () {
+                	return {
+                        ownAge: this.age
+                    }
+                },
+                template: `<div>
+    				<h1>{{ title }}</h1>
+    				<p>{{ content }}</p>
+    				<div>{{ ownAge }}</div>
+    				<button @click="handleClick">add</button>
+    			</div>`,
+                methods: {
+                    handleClick () {
+                        this.ownAge ++;
+                        // 给父组件传递this.ownAge数据
+                        this.$emit('toParent', this.ownAge);
+                    }
+                }
+            }
+        }
+    })
+    ```
+
+    ```html
+    <!-- 父组件与子组件的数据传递 -->
+    <hello :title="title" :content="content" v-bind="info" @toParent="sonToParent"></hello>
+    ```
+
+    
+
+    
 
 
 
