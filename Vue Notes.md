@@ -883,13 +883,62 @@ vm.$mount("div.demo");
     <hello :title="title" :content="content" v-bind="info" @toParent="sonToParent"></hello>
     ```
 
-    
+## ref引用
 
-    
+- ref引用：为了在Vue对象中使用dom元素，可以在对应的dom元素上加上ref属性，并在Vue对象中对应的组件中使用`this.$refs.ref属性值`就可以使用所引用的dom元素
 
+    - dom对象的引用是该对象，组件的引用是组件的实例对象
+    - ref同名时，后添加的会覆盖前面添加的，引用指向的是最后一个元素
+    - 在`v-for`时添加引用，引用的值类型是数组，数组里面是一个一个的dom对象/组件实例对象
 
+- 示例：
 
+    ```html
+    <div id="app">
+        <!-- 使用组件并定义其ref -->
+        <change-box-background ref="cbb"></change-box-background>
+        <button @click="handleClick">查看组件的refs</button>
+    </div>
+    ```
 
-
-
+    ```js
+    const vm = new Vue({
+        el: '#app',
+        data: {
+        },
+        methods: {
+            handleClick () {
+                // 使用this.$refs获取相应的组件对象
+                console.log(this.$refs.cbb);
+            }
+        },
+        components: {
+            'changeBoxBackground': {
+                template: `<div>
+    					<button 
+    						v-for="color in colorArr"
+    						:key="color"
+    						:style="{backgroundColor: color}"
+    						@click="handleClick(color)"
+    						ref="btn"
+    					>{{ color }}</button>
+    					<div class="box" ref="box"></div>
+                    </div>`,
+                data () {
+                    return {
+                        colorArr: ['ref', 'green', 'blue', 'yellow'],
+                    }
+                },
+                methods: {
+                    handleClick (color) {
+                        // 使用this.$refs来获取相应的dom对象
+                        this.$refs.box.style.backgroundColor = color;
+                        console.log(this.$refs.btn);
+                        // this.$refs.btn是一个包含4个button的dom对象的数组
+                    }
+                }
+            }
+        }
+    })
+    ```
 
