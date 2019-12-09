@@ -321,7 +321,7 @@ vm.$mount("div.demo");
         methods: {
             handleClick () {
                 console.log("You clicked the #app.")
-            }
+            }  
         }
     })
     ```
@@ -457,7 +457,7 @@ vm.$mount("div.demo");
         <li v-for="val in obj">{{ val }}</li>
         <li v-for="(val, key) in obj">{{ key }} - {{ val }}</li>
         <li v-for="(val, key, index) in obj">{{ index }} - {{ key }} - {{ val }}</li>
-    	<!-- 循环数字 -->
+        <!-- 循环数字 -->
         <li v-for="num in 10">{{ num }}</li> <!-- 数字1-10 -->
         <li v-for="(num, index) in 10">{{ index }} - {{ num }}</li>
         <!-- 循环字符串 -->
@@ -480,7 +480,29 @@ vm.$mount("div.demo");
     })
     ```
 
+-   在组件中使用`v-for`时，必须要加`:key="唯一标识"`属性（通常使用`index`），否则会报错。
 
+    ```vue
+    <template>
+        <div class="root">
+            <ul>
+                <li v-for="(item, index) in arr" :key="index">{{ item }}</li>
+        	</ul>
+        </div>
+    </template>
+    
+    <script>
+    export default {
+        data () {
+            return {
+                arr: [1, 2, 3, 4, 5]
+            }
+        }
+    }
+    </script>
+    ```
+
+    
 
 ### 渲染数组的注意点
 
@@ -500,7 +522,7 @@ vm.$mount("div.demo");
         el: '#app',
     	data: {
             arr: ['html', 'css', 'js'],
-        },
+        }, 
         methods: {
             handleClick () {
         		// 通过索引的方式来更改数组
@@ -624,7 +646,7 @@ vm.$mount("div.demo");
             ```html
             <div id="app">
                 <!-- input:text标签 双向绑定数据 => value -->
-            	<input type="text" v-model="value"> {{ value }} <br>
+                <input type="text" v-model="value"> {{ value }} <br>
                 <!-- textarea标签 双向绑定数据 => content -->
                 <textarea v-model="content"></textarea> {{ content }} <br>
                 <!-- input:checkbox 双向绑定数据 => checked -->
@@ -688,8 +710,9 @@ vm.$mount("div.demo");
     		name: "tishacy"
         },
         watch: {
-            name () {
+            name (val, oldVal) {
                 // 当 this.name 的值改变时，就会执行该函数
+              	console.log(val, oldVal);
             }
         }
     })
@@ -774,7 +797,11 @@ vm.$mount("div.demo");
     ```js
     const vm = new Vue({
         el: '#app',
-        data: {},
+        data () {
+            return {
+    						msg: 'hello vue component!'
+            }
+        },
         components: {
             'hello': {
                 template: "<div>Hello</div>"
@@ -784,7 +811,7 @@ vm.$mount("div.demo");
     ```
     
     -   注意：
-    -   注册组件的名字格式以及使用组件的格式与vue局部组件相同
+        -   注册组件的名字格式以及使用组件的格式与vue局部组件相同
 
 ## 父组件与子组件的数据传递
 
@@ -942,3 +969,94 @@ vm.$mount("div.demo");
     })
     ```
 
+# Vue脚手架
+
+## 安装脚手架
+
+-   安装node > 8.9
+
+-   安装3.x版本vue脚手架
+
+    ```bash
+    # 卸载旧版本的vue脚手架
+    $ npm uninstall vue-cli -g
+    
+    # 安装脚手架，用于生成项目
+    $ npm install -g @vue/cli
+    # 快速原型开发 编译.vue文件
+    $ npm install -g @vue/cli-service-global
+    # 查看vue-cli版本：
+    $ vue --version
+    
+    # 如果仍然需要使用旧版本的vue init功能，可以全局安装一个桥接工具
+    $ npm install -g @vue/cli-init	# 拉取旧版本
+    ```
+
+-   安装Vetur（VScode插件），来高亮显示vue代码
+
+## Vue项目目录结构
+
+```bash
+.
+├── README.md								# README
+├── babel.config.js					# Babel的配置文件
+├── node_modules						# npm install执行后所安装的库
+├── package-lock.json				# 依赖
+├── package.json						# 项目的基本信息，其中：“script”中是npm run可以执行的命令；“dependencies”和“devDependencies”是项目的依赖，执行npm install时会将这两部分的库下载到node_modules中
+├── public									
+│   ├── favicon.ico					# index.html中的图标文件
+│   └── index.html					# 项目的入口html文件
+└── src											# 项目的源码部分
+    ├── App.vue							# 项目的根组件
+    ├── assets							# 项目的静态文件，静态的css/js/image等文件
+    │   └── logo.png
+    ├── components					# 项目用到的Vue组件
+    │   └── HelloWorld.vue
+    └── main.js							# 项目的入口js文件 进入index.html入口后，vue会自动引入该js文件 该js文件中引入了vue库和App.vue根组件，并将根组件挂载到相应的dom元素上
+```
+
+## `.vue`文件
+
+-   一个vue文件就是组件，包含三个部分：
+    -   `template`标签（结构）：将组件的模板写在`template`标签内
+    -   `script`标签（行为）：将组件使用的数据、行为、计算属性等其他定义组件的内容写在script标签的`export default {}`中
+    -   `style`标签（样式）：将组件涉及到的css样式写入`style`标签
+    
+-   示例：`App.vue`文件
+
+    ```vue
+    <!-- 结构 -->
+    <template>
+    		<div> <!-- template标签中只能有一个根dom元素 -->
+            <h1>{{ msg }}</h1>
+            <div>I am a component.</div>
+    	</div>
+    </template>
+    
+    <!-- 行为 -->
+    <script>
+    export default {
+        data () {
+            return {
+                msg: "Hello world"
+            }
+        },
+        methods: {
+        }
+}
+    </script>
+    
+    <!-- 样式 -->
+    <style>
+        div {
+           backgroundColor: red;
+        }
+    </style>
+    ```
+    
+    ```bash
+    # 编译App.vue文件
+    $ vue serve App.vue
+    ```
+
+​    
