@@ -1291,7 +1291,50 @@ vm.$mount("div.demo");
 
   
 
+# Vue动态组件和缓存
 
+- 动态组件：`<component :is="sub-component"></component>`
 
+  - 可以通过控制`sub-component`的值来对应显示哪个组件
 
+  - 示例：
+
+    ```vue
+    <template>
+    	<div id="Component">
+            <!-- 定义动态组件 -->
+    		<component :is="sub-component"></component>
+            
+            <!-- 使用button控制sub-component的值，来动态控制显示哪一个组件 -->
+            <button @click="this['sub-component'] = 'sub-componenet1'">Change to sub-component 1</button>        
+            <button @click="this['sub-component'] = 'sub-componenet2'">Change to sub-component 2</button>
+        </div>
+    </template>
+    
+    <script>
+    import subComponent1 from './components/subComponent1.vue';
+    import subComponent2 from './components/subComponent2.vue';
+        
+    export default {
+        // 5. 将父组件传递过来的数据写在props中
+    	data() {
+            return {
+          		'sub-component': 'sub-component1';      
+            }
+        },
+        components: {
+            'sub-component1': subComponent1,
+            'sub-component2': subComponent2
+        },
+    }
+    </script>
+    
+    <style scoped>
+    /* CSS 样式 */
+    </style>
+    ```
+
+- 缓存：
+  - 当动态标签`<component></component>`需要来回切换时，每切换一次，之前动态标签中的数据就会被清空，切换回来之后动态标签中使用的方法也会被重新执行，为了切换之前的数据，需要用到缓存。
+  - 使用方法：只需要在`<component></component>`标签外嵌套一个`<keep-alive></keep-alive>`标签就可以实现动态标签的数据缓存。
 
