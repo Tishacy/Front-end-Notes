@@ -823,15 +823,15 @@ vm.$mount("div.demo");
             -   数组形式：包含字符串形式的传递的数据变量名，如示例中的`[“title”, “content”]`
             -   对象形式：包含对象形式的传递的数据，所传递的数据变量名作为key，value仍为一个对象，规定该数据的一些属性，比如类型、默认值、校验函数等，见示例。
         -   （传递数据）在html中使用组件的时候要以`:数据变量名="数据变量名"`绑定所传递的数据，如示例中的`:title=“title” :content=“content”`。
-        -   如果要将data中的一个对象中的全部属性传递给子组件，那么可以使用`v-bind=‘需要传递的对象’`，见示例。
+    -   如果要将data中的一个对象中的全部属性传递给子组件，那么可以使用`v-bind=‘需要传递的对象’`，见示例。
     
 -   子组件向父组件的数据传递：
 
     -   需要两步
-        -   子组件中的`methods`中的事件函数触发时，在事件函数内部调用`this.$emit(‘触发事件函数名’, 需要传递的数据)`。
+        -   在子组件中触发某一事件，并在该事件触发的函数中使用`this.$emit(‘触发事件函数名’, 需要传递的数据)`来注册父组件触发的事件。
         -   父组件中的`methods`中添加相应的触发事件函数，就可以接收到子组件传递的数据
 
--   示例：
+-   CDN示例：
 
     ```js
     const vm = new Vue({
@@ -910,6 +910,113 @@ vm.$mount("div.demo");
     <hello :title="title" :content="content" v-bind="info" @toParent="sonToParent"></hello>
     ```
 
+-   脚手架示例
+
+    -   父组件向子组件传数据
+
+        ```vue
+        <!-- 父组件 -->
+        <template>
+            <div class="parentComponent">
+                <!-- 2.将数据传递给子组件 -->
+                <son-component :transData="transData"></son-component>
+            </div>
+        </template>
+        
+        <script>
+        import sonComponent from "./components/sonComponent.vue";
+            
+        export default {
+            data () {
+                return {
+            		// 1. 定义传递的值
+                    transData: "Data transfered to son component",
+                }
+            },
+            components: {
+                "son-component": sonComponent
+            }
+        }
+        </script>
+        ```
+
+        ```vue
+        <!-- 子组件 -->
+        <template>
+        	<div class="sonComponent">
+                <!-- 4. 使用所传递的数据 -->
+                传递的数据为：{{ transData }}
+            </div>
+        </template>
+        
+        <script>
+        export default {
+        	// 3. 在子组件中的prop中设置所接收到的数据    
+            props: {
+                'transData': {
+                    type: String
+                }
+            }
+        }
+    </script>
+        ```
+
+    -   子组件向父组件传递数据（需要通过触发事件的方式）
+    
+        ```vue
+        <!-- 子组件 -->
+        <template>
+        	<div class="sonComponent">
+                <!-- 2. 通过触发事件来向父组件传值 -->
+                <button @click="transData"></button>
+            </div>
+        </template>
+        
+        <script>
+        export default {
+            data() {
+                // 1. 定义需要传递给父组件的数据
+                'tdata': 'Data transfered to parent component'
+            },
+            methods: {
+                transData () {
+                    // 3. 注册父组件触发的事件，并将数据传给父组件
+                    this.$emit("sonToParent", this.tdata);
+                }
+            }
+        }
+    </script>
+        ```
+    
+        ```vue
+        <!-- 父组件 -->
+        <template>
+        	<div class="parentComponent">
+                <!-- 4. 父组件中使用子组件注册的触发事件函数，来获取子组件所传来的值 -->
+            	<son-component @sonToPrent="sonToParent"></son-component>
+                <h1>{{ title }}</h1>
+            </div>
+        </template>
+        
+        <script>
+        export default {
+            data () {
+                return {
+                    title: ""
+                }
+            }
+            methods: {
+                sonToParent(tdata) {
+                    // 5. 使用子组件中所传递的值
+                    this.title = tdata;
+                }
+            }
+        }
+    </script>
+        ```
+    
+        
+
 ## ref引用
 
 - ref引用：为了在Vue对象中使用dom元素，可以在对应的dom元素上加上ref属性，并在Vue对象中对应的组件中使用`this.$refs.ref属性值`就可以使用所引用的dom元素
@@ -969,6 +1076,8 @@ vm.$mount("div.demo");
     })
     ```
 
+
+
 # Vue脚手架
 
 ## 安装脚手架
@@ -998,26 +1107,26 @@ vm.$mount("div.demo");
 
 ```bash
 .
-├── README.md								# README
-├── babel.config.js					# Babel的配置文件
-├── node_modules						# npm install执行后所安装的库
-├── package-lock.json				# 依赖
-├── package.json						# 项目的基本信息，其中：“script”中是npm run可以执行的命令；“dependencies”和“devDependencies”是项目的依赖，执行npm install时会将这两部分的库下载到node_modules中
+├── README.md					# README
+├── babel.config.js				# Babel的配置文件
+├── node_modules				# npm install执行后所安装的库
+├── package-lock.json			# 依赖
+├── package.json				# 项目的基本信息，其中：“script”中是npm run可以执行的命令；“dependencies”和“devDependencies”是项目的依赖，执行npm install时会将这两部分的库下载到node_modules中
 ├── public									
-│   ├── favicon.ico					# index.html中的图标文件
-│   └── index.html					# 项目的入口html文件
-└── src											# 项目的源码部分
-    ├── App.vue							# 项目的根组件
-    ├── assets							# 项目的静态文件，静态的css/js/image等文件
+│   ├── favicon.ico				# index.html中的图标文件
+│   └── index.html				# 项目的入口html文件
+└── src							# 项目的源码部分
+    ├── App.vue					# 项目的根组件
+    ├── assets					# 项目的静态文件，静态的css/js/image等文件
     │   └── logo.png
-    ├── components					# 项目用到的Vue组件
+    ├── components				# 项目用到的Vue组件
     │   └── HelloWorld.vue
-    └── main.js							# 项目的入口js文件 进入index.html入口后，vue会自动引入该js文件 该js文件中引入了vue库和App.vue根组件，并将根组件挂载到相应的dom元素上
+    └── main.js					# 项目的入口js文件 进入index.html入口后，vue会自动引入该js文件 该js文件中引入了vue库和App.vue根组件，并将根组件挂载到相应的dom元素上
 ```
 
 ## `.vue`文件
 
--   一个vue文件就是组件，包含三个部分：
+-   一个vue文件就是一个vue组件，包含三个部分：
     -   `template`标签（结构）：将组件的模板写在`template`标签内
     -   `script`标签（行为）：将组件使用的数据、行为、计算属性等其他定义组件的内容写在script标签的`export default {}`中
     -   `style`标签（样式）：将组件涉及到的css样式写入`style`标签
@@ -1059,4 +1168,130 @@ vm.$mount("div.demo");
     $ vue serve App.vue
     ```
 
-​    
+
+
+# Vue生命周期
+
+<div style="width: 500px; margin:0 auto;">
+	<img src="https://cn.vuejs.org/images/lifecycle.png">
+    <p style="text-align: center">
+        Vue的生命周期
+    </p>
+</div>
+
+## 生命周期中的钩子函数
+
+- 钩子函数可以让开发者在一个组件的生命周期饿某些关键节点处执行自己需要的函数。
+  - `beforeCreated`: 初始化事件和生命周期之后，但是在初始化注入和校验之前
+    - 这个时候实例还没有被创建，所以无法知道`data`，也不能用`watch`监听
+  - `created`: 在初始化注入和校验之后
+    - 此时实例已经创建，可以获取data和使用watch进行监听数据，但是页面还是空白的
+  - `beforeMount`: 已经加载template之后，但是还没有挂载到对应的DOM元素上
+    - 页面挂载前，此时页面依然是空白的，这时render函数首次被调用
+  - `mounted`: 将template挂载到对应的DOM元素之后
+    - 页面被挂载了，该函数执行后你可以看到页面中的内容，也可以访问到dom
+  - `beforeUpdate`：实例数据修改后，但是还没有重新渲染DOM之前
+  - `updated`: 实例数据修改后，并且已经重新渲染DOM之后
+  - `beforeDestroy`: 当调用`$destroy()`函数之后，但是还没有解除绑定、销毁子组件和事件监听器之前
+    - 页面离开之前被调用，清除定时器，或者第三方的一些DOM结构
+  - `destroyed`: 当调用`$destroy()`函数之后，并且已经解除绑定和销毁子组件以及事件监听器之后
+
+
+
+# Vue的插槽slot
+
+- slot的目的：将父组件中定义的dom标签传递给子组件
+
+  - 没有slot的时候，父组件向子组件进行数据传递时只能传递变量值，不能传递DOM标签，slot就是为了能将父组件定义的slot标签传递给子组件。
+
+- 使用步骤：
+
+  - 父组件
+
+    - 定义slot标签。
+      - 方式是在子组件双标签内部写任意标签，只需要添加属性`slot="slot-name"`即可，如：`<h1 slot="title"></h1>`
+    - 定义slot标签中传递的数据，需要写在sender（传递方，即父组件）的`data`中
+    - 定义slot标签的样式：写在sender或者receiver都可以，但是推荐写在定义标签的一方
+      - 注意定义样式时不可以使用`div[slot="slot-name"]`来对应DOM元素，因为slot是虚拟DOM的属性，最终显示的DOM中并没有slot属性
+
+  - 子组件
+
+    - 用slot标签来占位，用来接收父组件传过来的标签。
+      - 方式是用slot标签，并添加属性`name=”slot-name“`即可，如：`<slot name=”title“></slot>`
+
+    - 将父组件传递过来的数据写在`props`中
+
+- 示例：
+
+  ```vue
+  <!-- 父组件 -->
+  <template>
+      <div id="parentCompoennt">
+      	<son-component>
+              <!-- slot 插槽: 含有slot属性的标签，会传递到子组件的对应slot中 -->
+              <!-- 1. 定义slot标签 -->
+              <div class="before-title" slot="before-title">{{ beforeTitle }}</div>
+              <div class="after-title" slot="after-title">{{ afterTitle }}</div>
+      	</son-component>
+      </div>
+  </template>
+  
+  <script>
+  import sonComponent from './components/sonComponent.vue';
+  
+  export default {
+      components: {
+          "som-component": sonComponent;
+      },
+      data() {
+          return {
+              // 2. slot标签中传递的数据需要写在sender（传递方，即父组件）的data中
+          	beforeTitle: 'This is the text before title.',
+              afterTitle: 'This is the text after title.'
+          }
+      },
+  }
+  </script>
+  
+  <style scoped>
+      /* 3. slot标签的样式：写在sender或者receiver都可以，但是推荐写在定义标签的一方, 注意定义样式时不可以使用div[slot="slot-name"]来对应标签 */
+      div.before-title {
+          font-style: italic;
+      }
+      div.after-title {
+          font-weight: bold;
+      }
+  </style>
+  ```
+
+  ```vue
+  <!-- 子组件 -->
+  <template>
+  	<div id="sonComponent">
+          <!-- 4. 用slot标签来占位，用来接收父组件传过来的标签 -->
+          <slot name="before-title">{{ beforeTitle }}</slot>
+          <h1>This is the title</h1>
+          <slot name="after-title">{{ afterTitle }}</slot>
+      </div>
+  </template>
+  
+  <script>
+  export default {
+      // 5. 将父组件传递过来的数据写在props中
+      props: {
+          beforeTitle: {},
+          afterTitle: {}
+      }
+  }
+  </script>
+  
+  <style scoped>
+  </style>
+  ```
+
+  
+
+
+
+
+
