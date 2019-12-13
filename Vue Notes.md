@@ -12,6 +12,8 @@ Vue：一套用于构建用户界面的渐进式框架
     -   比如：当只需要构建一个简单页面的时候，只需要用到Vue声明式渲染部分就可以了，如果想要进一步的模块化，则需要使用Vue的组件系统部分。
 
     ![](./Notes Images/progressive.png)
+    
+    
 
 ## 框架和库的区别
 
@@ -803,7 +805,7 @@ vm.$mount("div.demo");
             }
         },
         components: {
-            'hello': {
+            hello: {
                 template: "<div>Hello</div>"
             }
         }
@@ -934,7 +936,7 @@ vm.$mount("div.demo");
                 }
             },
             components: {
-                "son-component": sonComponent
+                sonComponent
             }
         }
         </script>
@@ -953,7 +955,7 @@ vm.$mount("div.demo");
         export default {
         	// 3. 在子组件中的prop中设置所接收到的数据    
             props: {
-                'transData': {
+                transData: {
                     type: String
                 }
             }
@@ -976,7 +978,7 @@ vm.$mount("div.demo");
         export default {
             data() {
                 // 1. 定义需要传递给父组件的数据
-                'tdata': 'Data transfered to parent component'
+                tdata: 'Data transfered to parent component'
             },
             methods: {
                 transData () {
@@ -1047,7 +1049,7 @@ vm.$mount("div.demo");
             }
         },
         components: {
-            'changeBoxBackground': {
+            changeBoxBackground: {
                 template: `<div>
     					<button 
     						v-for="color in colorArr"
@@ -1241,7 +1243,7 @@ vm.$mount("div.demo");
   
   export default {
       components: {
-          "som-component": sonComponent;
+          son-component: sonComponent;
       },
       data() {
           return {
@@ -1293,48 +1295,132 @@ vm.$mount("div.demo");
 
 # Vue动态组件和缓存
 
-- 动态组件：`<component :is="sub-component"></component>`
+## 动态组件
 
-  - 可以通过控制`sub-component`的值来对应显示哪个组件
+动态组件：`<component :is="sub-component"></component>`
 
-  - 示例：
+- 可以通过控制`sub-component`的值来对应显示哪个组件
+
+- 示例：
+
+  ```vue
+  <template>
+  	<div id="Component">
+          <!-- 定义动态组件 -->
+  		<component :is="sub-component"></component>
+          
+          <!-- 使用button控制sub-component的值，来动态控制显示哪一个组件 -->
+          <button @click="this['sub-component'] = 'sub-componenet1'">Change to sub-component 1</button>        
+          <button @click="this['sub-component'] = 'sub-componenet2'">Change to sub-component 2</button>
+      </div>
+  </template>
+  
+  <script>
+  import subComponent1 from './components/subComponent1.vue';
+  import subComponent2 from './components/subComponent2.vue';
+      
+  export default {
+      // 5. 将父组件传递过来的数据写在props中
+  	data() {
+          return {
+        		'sub-component': 'sub-component1';      
+          }
+      },
+      components: {
+          'sub-component1': subComponent1,
+          'sub-component2': subComponent2
+      },
+  }
+  </script>
+  
+  <style scoped>
+  /* CSS 样式 */
+  </style>
+  ```
+
+## 缓存
+
+缓存：
+
+- 当动态标签`<component></component>`需要来回切换时，每切换一次，之前动态标签中的数据就会被清空，切换回来之后动态标签中使用的方法也会被重新执行，为了切换之前的数据，需要用到缓存。
+- 使用方法：只需要在`<component></component>`标签外嵌套一个`<keep-alive></keep-alive>`标签就可以实现动态标签的数据缓存。
+
+
+
+# 非父子组件间传值（发布订阅模式）
+
+![image-20191213184224884](../../../../Library/Application%20Support/typora-user-images/image-20191213184224884.png)
+
+- 非父子组件间的传值方法：
+
+  - BUS/总线/发布订阅模式/观察者模式（虽然是多个名称但是是一个方法）
+
+- 发布订阅模式具体做法：
+
+  - 在**根组件方**（通常为`App.vue`）中给`Vue.prototype`添加一个`bus`属性，值为新建Vue对象实例，该实例即为观察者。由于所有的Vue组件本质上都是一个Vue对象实例，因此，每个组件上都会有这个属性，作为一个观察者存在。
+
+    ```js
+    import Vue from 'vue';
+    
+    Vue.prototype.bus = new Vue();
+    ```
+
+  - 在传值的**传送组件方**（sender）定义相关事件，通过`this.bus.$emit`方法来给`bus`注册接收相关事件，并将值传递过去。
+
+    - 通过`this.bus.$emit`方法来给`bus`注册事件时，此时是在渲染页面之前就定义了的，因此在所有的Vue对象实例（或组件）的观察者bus中都注册了该事件。即一旦**通过观察者bus发布**，就是发布给了全体组件。
 
     ```vue
+    <!-- 数据发送方：发布 -->
     <template>
-    	<div id="Component">
-            <!-- 定义动态组件 -->
-    		<component :is="sub-component"></component>
-            
-            <!-- 使用button控制sub-component的值，来动态控制显示哪一个组件 -->
-            <button @click="this['sub-component'] = 'sub-componenet1'">Change to sub-component 1</button>        
-            <button @click="this['sub-component'] = 'sub-componenet2'">Change to sub-component 2</button>
+        <div id="sender">
+            <!-- 1. 定义相关传值事件 -->
+            <button @click="sendData"></button>
         </div>
     </template>
     
     <script>
-    import subComponent1 from './components/subComponent1.vue';
-    import subComponent2 from './components/subComponent2.vue';
-        
     export default {
-        // 5. 将父组件传递过来的数据写在props中
-    	data() {
+    	data () {
             return {
-          		'sub-component': 'sub-component1';      
+                data: 123,
             }
         },
-        components: {
-            'sub-component1': subComponent1,
-            'sub-component2': subComponent2
-        },
+        methods: {
+            // 2. 使用this.$bus.emit来给bus注册相关接收事件
+            sendData () {
+                this.$bus.emit('receiveData', this.data);
+            }
+        }
     }
     </script>
-    
-    <style scoped>
-    /* CSS 样式 */
-    </style>
     ```
 
-- 缓存：
-  - 当动态标签`<component></component>`需要来回切换时，每切换一次，之前动态标签中的数据就会被清空，切换回来之后动态标签中使用的方法也会被重新执行，为了切换之前的数据，需要用到缓存。
-  - 使用方法：只需要在`<component></component>`标签外嵌套一个`<keep-alive></keep-alive>`标签就可以实现动态标签的数据缓存。
+  - 在传值的**接收组件方**（receiver）通过在`mounted`钩子函数中监听接收事件来获取传送值。
+
+    - 由于值是发布给了所有的组件，因此任意组件都可以进行通过该方法来获取传值，即所有组件均可**订阅该数据**。
+
+    ```vue
+    <!-- 数据接收方：接收 -->
+    <template>
+    	<div id="receiver">
+            {{ dataReceived }}
+        </div>
+    </template>
+    
+    <script>
+    export default {
+        data () {
+            return {
+                dataReceived: ''
+            }
+        },
+        // 3. 在接收端，通过在mounted钩子函数中监听bus的相关接收事件来获取传送值
+        mounted () {
+            this.bus.on('receiveData', (data) => {
+                this.dataReceived = data;
+            })
+        }
+    }
+    </script>
+    ```
 
