@@ -1424,3 +1424,88 @@ vm.$mount("div.demo");
     </script>
     ```
 
+# Vue中使用第三方库
+
+## `animate.css`库
+
+### 在Vue中使用自定义动画
+
+- 步骤：
+  - 使用`<transition></transition>`标签将含有动画的Dom包裹，并增加属性`name='animationName'`
+  - 在CSS中，添加`<animationName>-enter-active {}`表示进入动画，`<animationName>-leave-active {}`表示退出动画
+
+- 示例：
+    ```vue
+    <template>
+        <div id="component">
+            <!-- 1. transition标签包裹，并添加animationName -->
+        <transition name="fade">
+    			<h1>Title</h1>
+            </transition>
+        </div>
+    </template>
+    
+    <style scoped>
+        @keyframes bounce-in {
+            0% { 
+                transform: scale(0);
+            }
+            50% {
+                transform: scale(1.5);
+            }
+            100% {
+                transform: scale(1);
+            }
+        }
+        /* 2. <animationName>-enter-active 和 <animationName>-leave-active
+        	来定义动画的样式
+        */
+        .fade-enter-active {
+            animation: bounce-in 1s;
+        }
+        .fade-leave-active {
+            animation: bounce-in 1s reverse;
+        }
+    </style>
+    ```
+
+### 在Vue中使用`animate.css`中的动画
+
+- 步骤：
+
+  - 引入`animated.css`库，有两种方式：
+
+    - 使用css引入：`@import '/path/to/animate.css';`
+
+    - 使用js引入：`import 'animate.css';`
+
+      > 使用js引入时，需要提前用npm安装该库`npm install animate.css --save`
+
+  - 使用`<transition></transition>`标签将含有动画的Dom包裹
+
+    - 添加属性`enter-active-class="animated <animate.css中的动画名>"`，表示入场动画
+    - 添加属性`leave-active-class="animated <animate.css中的动画名>"`，表示隐藏动画
+
+- 示例：
+
+  ```vue
+  <template>
+      <div id="component">
+          <transition
+              enter-active-class="animated shake"
+              leave-active-class="animated swing"
+           >
+  			<h1>Title</h1>
+          </transition>
+      </div>
+  </template>
+  
+  <style scoped>
+      @import 'assets/animated.css';
+  </style>
+  ```
+
+
+
+
+
