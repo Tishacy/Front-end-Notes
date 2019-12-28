@@ -1633,52 +1633,50 @@ vm.$mount("div.demo");
 
 - Vue.extend的进阶用法：给Vue新增API，在该API内创建组件并挂载。
 
-  ```html
-  <script>
-      // Create constructor of LoadingComponent
-      let LoadingComponent = Vue.extend({
-          template: `<div id="loading-wrapper">{{ msg }}</div>`,
+  ```js
+  // Create constructor of LoadingComponent
+  let LoadingComponent = Vue.extend({
+      template: `<div id="loading-wrapper">{{ msg }}</div>`,
+      props: {
+          msg: {
+              type: String,
+              default: 'loading...'
+          }
+      }
+  })
+  
+  // Add a new API: $loading
+  Vue.prototype.$loading = function (msg) {
+      const div = document.createElement('div');
+      div.setAttribute('id', 'loading-wrapper');
+      document.body.appendChild(div);
+      // Create a loading component
+      const loadingComponent = new LoadingComponent({
           props: {
               msg: {
                   type: String,
-                  default: 'loading...'
+                  default: msg
               }
           }
-      })
-      
-      // Add a new API: $loading
-      Vue.prototype.$loading = function (msg) {
-          const div = document.createElement('div');
-          div.setAttribute('id', 'loading-wrapper');
-          document.body.appendChild(div);
-          // Create a loading component
-          const loadingComponent = new LoadingComponent({
-              props: {
-                  msg: {
-                      type: String,
-                      default: msg
-                  }
-              }
-          });
-          loadingComponent.$mount('#loading-wrapper');
-          return () => {
-              const div = document.getElementById('loading-wrapper');
-              document.body.removeChild(div);
+      });
+      loadingComponent.$mount('#loading-wrapper');
+      return () => {
+          const div = document.getElementById('loading-wrapper');
+          document.body.removeChild(div);
+      }
+  }
+  
+  const vm = new Vue({
+      el: '#app',
+      methods: {
+          showLoading () {
+              const hide = this.$loading('正在加载中...请稍后');
+              setTimeout(() => {
+                  hide();
+              }, 3000);
           }
       }
-      
-      const vm = new Vue({
-          el: '#app',
-          methods: {
-              showLoading () {
-                  const hide = this.$loading('正在加载中...请稍后');
-                  setTimeout(() => {
-                      hide();
-                  }, 3000);
-              }
-          }
-      })
-  </script>
+  })
   ```
 
   ```html
@@ -1687,4 +1685,115 @@ vm.$mount("div.demo");
   </div>
   ```
 
+## `Vue.use`
+
+- `Vue.use(plugin)`
+
+  - **参数**：
+
+    - `{Object | Function} plugin`
+
+  - **用法**：
+
+    安装 Vue.js 插件。如果插件是一个对象，必须提供 `install` 方法。如果插件是一个函数，它会被作为 install 方法。install 方法调用时，会将 Vue 作为参数传入。
+
+    该方法需要在调用 `new Vue()` 之前被调用。
+
+    当 install 方法被同一个插件多次调用，插件将只会被安装一次。
+
+  - 示例：利用`Vue.extend`中给Vue添加`$loading`的API，来制作一个loading的插件
+
+    ```js
+    // 定义插件
+    const loadingPlugin = {
+        install: function (vm, args) {
+            // args为使用Vue.use时的额外参数
+            console.log(args); // 'args'
+            
+            // 定义loadingComponent的构造函数
+            const LoadingComponent = vm.component({
+                template: '<div id="loading-wrapper">{{ msg }}</div>',
+                props: {
+                    msg: {
+                        type: String,
+                        default: 'loading...'
+                    }
+                }
+            });
+            // 给Vue（vm）新增$loading的API
+            vm.$loading = function (msg) {
+                const div = document.createElement('div');
+                div.setAttribute('id', 'loading-wrapper');
+                document.body.appendChild(div);
+                const loadingComponent = new LoadingComponent({
+                    props: {
+                        msg: {
+                            type: String,
+                            default: msg
+                        }
+                    }
+                });
+                loadingComponent.$mount('#loading-wrapper');
+                return () => {
+                    const div = document.getElementById('loading-wrapper');
+                    document.body.removeChild(div);
+                }
+            }
+        }
+    }
+    
+    // 使用插件
+    Vue.use(loadingPlugin, 'args');
+    
+    // 新建Vue实例
+    const vm = new Vue({
+        el: '#app',
+        methods: {
+            showLoading () {
+                const hide = this.$loading('正在加载中...请稍后');
+                setTimeout(() => {
+                    hide();
+                }, 3000)
+            }
+      }
+    })
+    ```
+    
+    ```html
+    <div id="app">
+        <button @click="showLoading">show loading</button>
+    </div>
+    ```
+
+- `Vue.use(plugin)`源码解析：
+
+  ```js
+  function initUse (Vue) {
+      Vue.use = function (plugin) {
+          // 检查已安装的插件
+          var installedPlugins = (this._installedPlugins || this._installedPlugins = []);
+          if (installedPlugins.indexOf(plugin) > -1) {
+              return this;
+          }
+          
+          // 提取传入的额外参数
+          var args = toArray(arguments, 1);
+          // 将this(Vue)放入参数列表第一项
+          args.unshift(this);
+          
+          if (typeof plugin.install === 'function') {
+              // 执行plugin对象中的install函数，并传参
+              plugin.install.apply(plugin, args);
+          } else if (typeof plugin === 'function') {
+              // 如果plugin本身就是个函数，就执行plugin本身，并传参
+              plugin.apply(null, args);
+          }
+          installedPlugins.push(plugin);
+          return this
+      }
+}
+  ```
   
+  - 通过源码解析，可以看出
+    - `plugin`本身可以是对象也可以是函数，同用法中描述
+    - `plugin.install`或`plugin`的函数的第一个参数为Vue本身，后面可以传参数
