@@ -801,7 +801,7 @@ vm.$mount("div.demo");
         el: '#app',
         data () {
             return {
-    						msg: 'hello vue component!'
+                msg: 'hello vue component!'
             }
         },
         components: {
@@ -909,7 +909,9 @@ vm.$mount("div.demo");
 
     ```html
     <!-- 父组件与子组件的数据传递 -->
-    <hello :title="title" :content="content" v-bind="info" @toParent="sonToParent"></hello>
+    <div id="app">
+        <hello :title="title" :content="content" v-bind="info" @toParent="sonToParent"></hello>
+    </div>
     ```
 
 -   脚手架示例
@@ -1340,12 +1342,11 @@ vm.$mount("div.demo");
 
 ## 缓存
 
-缓存：
-
 - 当动态标签`<component></component>`需要来回切换时，每切换一次，之前动态标签中的数据就会被清空，切换回来之后动态标签中使用的方法也会被重新执行，为了切换之前的数据，需要用到缓存。
-- 使用方法：只需要在`<component></component>`标签外嵌套一个`<keep-alive></keep-alive>`标签就可以实现动态标签的数据缓存。
-
-
+- **使用方法**：只需要在`<component></component>`标签外嵌套一个`<keep-alive></keep-alive>`标签就可以实现动态标签的数据缓存。
+  - 使用`<keep-alive></keep-alive>`后，切换页面再返回时，不再执行`mounted`钩子函数的内容，而是从缓存中读取上次`mounted`钩子函数中所请求的数据。
+  - 如果返回页面时需要更新一些数据，可以利用一个生命周期钩子`activated`，用来更新缓存的数据。
+    - 每当组件被激活时（一般来说就是被显示出来），就会执行`activated`钩子函数，可以在该钩子函数中更新缓存的数据
 
 # 非父子组件间传值（发布订阅模式）
 
@@ -1493,8 +1494,7 @@ vm.$mount("div.demo");
       <div id="component">
           <transition
               enter-active-class="animated shake"
-              leave-active-class="animated swing"
-           >
+              leave-active-class="animated swing">
   			<h1>Title</h1>
           </transition>
       </div>
@@ -1507,5 +1507,184 @@ vm.$mount("div.demo");
 
 
 
+# Vue 进阶
 
+## `Vue.directive`
 
+-  `Vue.directive(id, [definition])`
+
+    - **Arguments:**
+
+      - `{string} id`
+      - `{Function | Object} [definition]`
+
+    - **Usage:**
+
+      Register or retrieve a global directive.
+
+      ```js
+      // register
+      Vue.directive('my-directive', {
+        bind: function () {},
+        inserted: function () {},
+        update: function () {},
+        componentUpdated: function () {},
+        unbind: function () {}
+      })
+
+      // register (function directive)
+      Vue.directive('my-directive', function () {
+        // this will be called as `bind` and `update`
+      })
+
+      // getter, return the directive definition if registered
+      var myDirective = Vue.directive('my-directive')
+      ```
+
+    - **Example**:
+
+      Register a global directive called `v-loading` that check if the page is loading.
+
+      ```html
+      <!-- general html parts -->
+      <div id="app" v-loading="isLoading">
+          <button @click="updateData">update</button>
+      </div>
+
+      <script type="module">
+      import Vue from 'vue';
+
+      Vue.directive('loading', {
+          // when the binding.value changes, this `update`
+          // function will triggerd.
+          update (el, binding, vnode) {
+              if (binding.value) {
+                  const div = document.createElement('div');
+                  div.setAttribute('id', 'loading');
+                  div.innerText = 'loading...';
+                  document.body.append(div);
+              } else {
+                const div = document.getElementById('loading');           
+                  document.body.removeChild(div);
+              }
+          }
+      })
+
+      const vm = new Vue({
+          el: '#app',
+          data: {
+              isLoading: false
+          },
+          methods: {
+              updateData () {
+                  // mimic updating data
+                  this.isLoading = true;
+                  console.log('loading');
+                  setTimeout(() => {
+                      this.isLoading = false;
+                  }, 3000);
+              }
+          }
+      })
+      </script>
+      ```
+
+##   `Vue.extend`
+
+- `Vue.extend(options)`
+
+  - **Arguments:**
+
+    - `{Object} options`
+
+  - **Usage:**
+
+    Create a “subclass” of the base Vue constructor. The argument should be an object containing component options.
+
+    The special case to note here is the `data` option - it must be a function when used with `Vue.extend()`.
+
+    - `Vue.extend()`本质上就是改造`Vue.component()构造函数成为一个新的组件的构造函数。
+
+    ```html
+    <div id="mount-point"></div>
+    ```
+
+    ```js
+    // create constructor
+    var Profile = Vue.extend({
+      template: '<p>{{firstName}} {{lastName}} aka {{alias}}</p>',
+      data: function () {
+        return {
+          firstName: 'Walter',
+          lastName: 'White',
+          alias: 'Heisenberg'
+        }
+      }
+    })
+    // create an instance of Profile and mount it on an element
+    new Profile().$mount('#mount-point')
+    ```
+
+    Will result in:
+
+    ```html
+    <p>Walter White aka Heisenberg</p>
+    ```
+
+- Vue.extend的进阶用法：给Vue新增API，在该API内创建组件并挂载。
+
+  ```html
+  <script>
+      // Create constructor of LoadingComponent
+      let LoadingComponent = Vue.extend({
+          template: `<div id="loading-wrapper">{{ msg }}</div>`,
+          props: {
+              msg: {
+                  type: String,
+                  default: 'loading...'
+              }
+          }
+      })
+      
+      // Add a new API: $loading
+      Vue.prototype.$loading = function (msg) {
+          const div = document.createElement('div');
+          div.setAttribute('id', 'loading-wrapper');
+          document.body.appendChild(div);
+          // Create a loading component
+          const loadingComponent = new LoadingComponent({
+              props: {
+                  msg: {
+                      type: String,
+                      default: msg
+                  }
+              }
+          });
+          loadingComponent.$mount('#loading-wrapper');
+          return () => {
+              const div = document.getElementById('loading-wrapper');
+              document.body.removeChild(div);
+          }
+      }
+      
+      const vm = new Vue({
+          el: '#app',
+          methods: {
+              showLoading () {
+                  const hide = this.$loading('正在加载中...请稍后');
+                  setTimeout(() => {
+                      hide();
+                  }, 3000);
+              }
+          }
+      })
+  </script>
+  ```
+
+  ```html
+  <div id="app">
+  	<button @click="showLoading">update</button>
+  </div>
+  ```
+
+  
