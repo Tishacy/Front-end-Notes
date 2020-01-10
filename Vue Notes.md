@@ -290,7 +290,7 @@ vm.$mount("div.demo");
     -   用对象数组的形式将类写在属性中，相当于上两种方式的结合
     
         ```html
-        <div :class="[{red: true}, {box: true}]"></div>
+        <div :class="[{red: true},                                                                                                             {box: true}]"></div>
         ```
 
 -   `style`：与`class`类似
@@ -614,7 +614,7 @@ vm.$mount("div.demo");
 
 
 
-## 双向数据绑定
+## 双向数据绑定`v-model`
 
 -   `v-model`：实现数据的双向绑定
 
@@ -1603,7 +1603,7 @@ vm.$mount("div.demo");
 
     The special case to note here is the `data` option - it must be a function when used with `Vue.extend()`.
 
-    - `Vue.extend()`本质上就是改造`Vue.component()构造函数成为一个新的组件的构造函数。
+    - `Vue.extend()`本质上就是改造`Vue.component()`构造函数成为一个新的组件的构造函数。
 
     ```html
     <div id="mount-point"></div>
@@ -1797,3 +1797,148 @@ vm.$mount("div.demo");
   - 通过源码解析，可以看出
     - `plugin`本身可以是对象也可以是函数，同用法中描述
     - `plugin.install`或`plugin`的函数的第一个参数为Vue本身，后面可以传参数
+
+## 监听器`watch`进阶
+
+### 用法1：常用用法
+
+```javascript
+let vm = new Vue({
+    el: '#app',
+    data () {
+        return {
+            msg: 'this is a message',
+            copyMsg: ''
+        }
+    },
+    watch: {
+        // msg是一个函数，当vm.msg发生变化时执行该函数
+		msg (val) {
+            this.copyMsg = val;
+        }
+    }
+})
+```
+
+### 用法2：绑定方法
+
+- 传入字符串形式的methods中的函数
+
+```js
+let vm = new Vue({
+    el: '#app',
+    data () {
+        return {
+            msg: 'this is a message',
+            copyMsg: ''
+        }
+    },
+    watch: {
+        // msg传入字符串形式的methods中定义的函数，当vm.msg发生变化是，执行对应函数
+		msg: 'handleMsg'
+    },
+    methods: {
+        handleMsg (val) {
+            this.copyMsg = val;
+        }
+    }
+})
+```
+
+### 用法3：`handler` + `deep` + `immediate`
+
+```js
+let vm = new Vue({
+    el: '#app',
+    data () {
+        return {
+            msg: {
+                a: {
+                    b: 'deep message'
+                }
+            },
+            copyMsg: ''
+        }
+    },
+    watch: {
+        // msg传入一个对象
+        // @param function handler: vm.msg变化时所执行的函数
+        // @param boolean deep:
+        //		true: 当vm.msg（多层嵌套）下的任意一层数据发生变化时就会触发执行函数
+        //		false: 只有当vm.msg最上面一层发生数据变化时才会触发执行函数
+        // @param boolean immediate: 在最初渲染的时候就触发执行函数（虽然最初copyMsg为空串，但是也会执行该函数变成'deep message'）
+		msg: {
+            handler: 'handleDeepMsg',
+            deep: true,
+            immediate: true
+        }
+    },
+    methods: {
+        handleDeepMsg (obj) {
+			this.copyMsg = obj.a.b;            
+        }
+    }
+})
+```
+
+### 用法4：绑定多个`handler`
+
+```js
+let vm = new Vue({
+    el: '#app',
+    data () {
+        return {
+            msg: 'this is a msg'
+            copyMsg: ''
+        }
+    },
+    watch: {
+        // msg传入一个列表
+		msg: [{
+            handler: 'handleMsg',	// 使用对象中handler: 函数名字符串
+        },
+            'handleMsg2',			// 使用函数名字符串作为handler
+            function (val) {		// 使用函数作为handler
+                // handleMsg3
+                this.copyMsg = val + '...'
+            }]
+    },
+    methods: {
+        handleMsg (val) {
+			this.copyMsg = val + '!'         
+        },
+        handleMsg2 (val) {
+            this.copyMsg = val + '*'
+        }
+    }
+}) 
+```
+
+### 用法5：监听对象属性
+
+- 比deep更轻量一些，因为不需要对所监听数据对象下的所有层级都进行监听
+
+```js
+let vm = new Vue({
+    el: '#app',
+    data () {
+        return {
+            msg: {
+                a: {
+                    b: 'deep message'
+                }
+            },
+            copyMsg: ''
+        }
+    },
+    watch: {
+		'msg.a.b': 'handleDeepMsg'
+    },
+    methods: {
+        handleDeepMsg (val) {
+			this.copyMsg = val;
+        }
+    }
+})
+```
+
